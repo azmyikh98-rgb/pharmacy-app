@@ -1,0 +1,39 @@
+<!--
+  pagination.html
+  -----------------------------------------------------------------------
+  Referensi pola "Reusable Pagination" memakai factory paginationControl()
+  dari js/ui-components.js. Sama seperti table.html, fragment ini berisi
+  contoh dummy untuk showcase Tahap 2 — modul bisnis menyalin pola ini
+  dengan totalItems dari hasil Api.get(...) dan mendengarkan
+  @page-change="fetchData($event.detail.page)".
+-->
+<div
+  x-data="paginationControl({ totalItems: 87, pageSize: 20, currentPage: 1 })"
+  class="flex flex-col items-center justify-between gap-3 px-1 py-3 text-sm text-slate-500 sm:flex-row"
+>
+  <p>
+    Menampilkan
+    <span class="font-medium text-slate-700" x-text="(currentPage - 1) * pageSize + 1"></span>
+    –
+    <span class="font-medium text-slate-700" x-text="Math.min(currentPage * pageSize, totalItems)"></span>
+    dari
+    <span class="font-medium text-slate-700" x-text="totalItems"></span>
+    data
+  </p>
+
+  <div class="flex items-center gap-1">
+    <button type="button" class="pagination-btn" :disabled="currentPage === 1" @click="prev()">‹</button>
+
+    <template x-for="page in pageNumbers" :key="page">
+      <button
+        type="button"
+        class="pagination-btn"
+        :class="page === currentPage && 'pagination-btn-active'"
+        @click="goTo(page)"
+        x-text="page"
+      ></button>
+    </template>
+
+    <button type="button" class="pagination-btn" :disabled="currentPage === totalPages" @click="next()">›</button>
+  </div>
+</div>

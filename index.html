@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modern Pharmacy Management System</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind.config.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+</head>
+<body class="flex min-h-screen items-center justify-center bg-surface font-sans text-slate-500 antialiased">
+
+  <!--
+    index.html sekarang HANYA berfungsi sebagai entry-point router:
+    - Sudah login  -> redirect ke pages/dashboard.html
+    - Belum login  -> redirect ke pages/login.html
+    Tidak ada logic tampilan lain di sini. Preview Design System (Tahap 2)
+    dipindahkan ke pages/design-system.html sebagai referensi pengembangan.
+  -->
+  <p>Mengalihkan...</p>
+
+  <script>
+    window.location.href = Auth.isLoggedIn() ? "pages/dashboard.html" : "pages/login.html";
+  </script>
+</body>
+</html>

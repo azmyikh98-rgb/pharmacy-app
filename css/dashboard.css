@@ -1,0 +1,38 @@
+/**
+ * dashboard.css
+ * -----------------------------------------------------------------------
+ * Style khusus halaman Dashboard. Class umum (card, button, badge) TETAP
+ * dari css/style.css — file ini hanya untuk kebutuhan spesifik dashboard
+ * seperti tinggi tetap area chart (Chart.js butuh parent berukuran pasti
+ * supaya responsive:true tidak menyebabkan canvas tumbuh tanpa henti).
+ * -----------------------------------------------------------------------
+ */
+
+.chart-card {
+  position: relative;
+  height: 280px;
+}
+
+.chart-card canvas {
+  max-height: 100%;
+}
+
+.summary-card-icon {
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.activity-item:last-child {
+  border-bottom: none;
+}

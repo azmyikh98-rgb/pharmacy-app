@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pembelian — Modern Pharmacy Management System</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../js/tailwind.config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/purchase.css" />
+
+  <script src="../js/config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/layout.js"></script>
+  <script src="../js/toast.js"></script>
+  <script src="../js/modal.js"></script>
+  <script src="../js/ui-components.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/purchase.js"></script>
+</head>
+<body class="min-h-screen bg-surface font-sans text-slate-800 antialiased">
+  <script>Auth.requireAuth();</script>
+
+  <div x-data class="flex h-screen overflow-hidden">
+    <aside class="hidden lg:block" data-include="../components/sidebar.html"></aside>
+    <div x-show="$store.layout.sidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-slate-900/50 lg:hidden" style="display:none;" @click="$store.layout.closeSidebar()"></div>
+    <div x-show="$store.layout.sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="fixed inset-y-0 left-0 z-50 lg:hidden" style="display:none;" data-include="../components/sidebar.html"></div>
+
+    <div class="flex flex-1 flex-col overflow-hidden">
+      <div data-include="../components/navbar.html"></div>
+
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8" x-data="purchasePage()" x-init="init()">
+        <div class="mx-auto max-w-6xl space-y-6">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 class="text-xl font-semibold text-slate-900">Pembelian</h1>
+              <p class="mt-1 text-sm text-slate-500">Purchase Order, penerimaan barang, dan retur pembelian.</p>
+            </div>
+            <button type="button" class="btn btn-primary" @click="openCreate()">+ Buat Purchase Order</button>
+          </div>
+
+          <div class="relative w-full sm:max-w-xs">
+            <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+            <input type="text" class="input-field pl-9" placeholder="Cari nomor PO / supplier..." x-model="search" @input="onSearchInput()" />
+          </div>
+
+          <div class="app-card overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="border-b border-slate-100 bg-slate-50/60 text-xs font-medium uppercase tracking-wide text-slate-500">
+                  <tr>
+                    <th class="px-4 py-3">No. PO</th>
+                    <th class="px-4 py-3">Tanggal</th>
+                    <th class="px-4 py-3">Supplier</th>
+                    <th class="px-4 py-3 text-right">Total</th>
+                    <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <template x-if="loading">
+                    <template x-for="i in 3" :key="i">
+                      <tr><td class="px-4 py-3" colspan="6"><div class="skeleton-line"></div></td></tr>
+                    </template>
+                  </template>
+
+                  <template x-if="!loading">
+                    <template x-for="row in rows" :key="row.id">
+                      <tr class="hover:bg-slate-50/70">
+                        <td class="px-4 py-3 font-medium text-slate-700" x-text="row.po_number"></td>
+                        <td class="px-4 py-3 text-slate-600" x-text="formatDate(row.date)"></td>
+                        <td class="px-4 py-3 text-slate-600" x-text="row.supplier"></td>
+                        <td class="px-4 py-3 text-right text-slate-700" x-text="formatRupiah(row.total)"></td>
+                        <td class="px-4 py-3"><span class="badge" :class="statusBadgeClass(row.status)" x-text="statusLabel(row.status)"></span></td>
+                        <td class="whitespace-nowrap px-4 py-3 text-right">
+                          <button type="button" class="btn btn-ghost" @click="openEdit(row)" x-text="row.status === 'draft' ? 'Edit' : 'Lihat'"></button>
+                          <button type="button" class="btn btn-ghost text-primary-600" x-show="row.status === 'draft'" @click="askApprove(row)">Approve</button>
+                          <button type="button" class="btn btn-ghost text-success-600" x-show="row.status === 'approved'" @click="askReceive(row)">Terima</button>
+                          <button type="button" class="btn btn-ghost text-warning-600" x-show="row.status === 'received'" @click="openRetur(row)">Retur</button>
+                          <button type="button" class="btn btn-ghost text-danger-600" x-show="row.status === 'draft' || row.status === 'approved'" @click="askCancel(row)">Batal</button>
+                        </td>
+                      </tr>
+                    </template>
+                  </template>
+
+                  <template x-if="!loading && rows.length === 0">
+                    <tr><td class="px-4 py-8 text-center text-slate-400" colspan="6">Belum ada Purchase Order</td></tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-center justify-between gap-3 px-1 py-1 text-sm text-slate-500 sm:flex-row">
+            <p>
+              Menampilkan
+              <span class="font-medium text-slate-700" x-text="total === 0 ? 0 : (page - 1) * pageSize + 1"></span>
+              –
+              <span class="font-medium text-slate-700" x-text="Math.min(page * pageSize, total)"></span>
+              dari
+              <span class="font-medium text-slate-700" x-text="total"></span> data
+            </p>
+            <div class="flex items-center gap-1">
+              <button type="button" class="pagination-btn" :disabled="page === 1" @click="prevPage()">‹</button>
+              <template x-for="p in pageNumbers" :key="p">
+                <button type="button" class="pagination-btn" :class="p === page && 'pagination-btn-active'" @click="goToPage(p)" x-text="p"></button>
+              </template>
+              <button type="button" class="pagination-btn" :disabled="page === totalPages" @click="nextPage()">›</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal: Buat / Edit / Lihat PO -->
+        <div x-show="showModal" x-transition.opacity class="modal-backdrop items-start overflow-y-auto py-8" style="display: none;" @keydown.escape.window="closeModal()">
+          <div class="modal-panel max-w-3xl" @click.outside="closeModal()">
+            <h3 class="text-base font-semibold text-slate-900" x-text="isEdit ? ('Purchase Order ' + (form.po_number || '')) : 'Buat Purchase Order'"></h3>
+
+            <div x-show="formError" x-transition class="mt-3 rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-700" x-text="formError" style="display:none;"></div>
+
+            <form @submit.prevent="submitForm()" class="mt-4 space-y-4">
+              <fieldset :disabled="isEdit && form.status !== 'draft'" class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="input-label">Tanggal</label>
+                    <input type="date" class="input-field" x-model="form.date" required />
+                  </div>
+                  <div>
+                    <label class="input-label">Supplier <span class="text-danger-600">*</span></label>
+                    <input type="text" class="input-field" x-model="form.supplier" placeholder="Nama supplier" required />
+                  </div>
+                </div>
+
+                <!-- Item obat -->
+                <div>
+                  <label class="input-label">Item Obat</label>
+                  <div class="overflow-x-auto rounded-lg border border-slate-100">
+                    <table class="item-row-table w-full text-left">
+                      <thead class="bg-slate-50/60 text-xs font-medium uppercase text-slate-500">
+                        <tr>
+                          <th>Obat</th>
+                          <th class="w-24">Qty</th>
+                          <th class="w-32">Harga Beli</th>
+                          <th class="w-32 text-right">Subtotal</th>
+                          <th class="w-10"></th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100">
+                        <template x-for="(item, index) in form.items" :key="index">
+                          <tr>
+                            <td>
+                              <select class="input-field" x-model="item.medicine_id" @change="onMedicineChange(item)" required>
+                                <option value="">- Pilih Obat -</option>
+                                <template x-for="m in medicines" :key="m.id"><option :value="m.id" x-text="m.name"></option></template>
+                              </select>
+                            </td>
+                            <td><input type="number" min="1" class="input-field" x-model="item.qty" required /></td>
+                            <td><input type="number" min="0" class="input-field" x-model="item.buy_price" required /></td>
+                            <td class="text-right text-slate-700" x-text="formatRupiah(itemSubtotal(item))"></td>
+                            <td>
+                              <button type="button" class="btn btn-ghost text-danger-600" @click="removeItemRow(index)">&times;</button>
+                            </td>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
+                  <button type="button" class="btn btn-outline mt-2" @click="addItemRow()">+ Tambah Item</button>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 text-sm">
+                  <span class="text-slate-500">Total Pembelian:</span>
+                  <span class="text-base font-semibold text-slate-900" x-text="formatRupiah(formTotal)"></span>
+                </div>
+
+                <div>
+                  <label class="input-label">Invoice (URL Dokumen)</label>
+                  <input type="text" class="input-field" x-model="form.invoice_url" placeholder="https://..." />
+                </div>
+                <div>
+                  <label class="input-label">Catatan</label>
+                  <textarea class="input-field" rows="2" x-model="form.notes"></textarea>
+                </div>
+              </fieldset>
+
+              <div class="mt-5 flex justify-end gap-2">
+                <button type="button" class="btn btn-ghost" @click="closeModal()">Tutup</button>
+                <button type="submit" class="btn btn-primary" x-show="!isEdit || form.status === 'draft'" :disabled="saving">
+                  <span x-show="!saving">Simpan</span>
+                  <span x-show="saving">Menyimpan...</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Modal: Retur Pembelian -->
+        <div x-show="showReturModal" x-transition.opacity class="modal-backdrop" style="display: none;" @keydown.escape.window="closeReturModal()">
+          <div class="modal-panel max-w-md" @click.outside="closeReturModal()">
+            <h3 class="text-base font-semibold text-slate-900">Retur Pembelian</h3>
+            <div x-show="returError" x-transition class="mt-3 rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-700" x-text="returError" style="display:none;"></div>
+
+            <form @submit.prevent="submitRetur()" class="mt-4 space-y-3">
+              <div>
+                <label class="input-label">Obat</label>
+                <select class="input-field" x-model="returForm.medicine_id" required>
+                  <template x-for="item in returItems" :key="item.medicine_id"><option :value="item.medicine_id" x-text="item.medicine_name"></option></template>
+                </select>
+              </div>
+              <div>
+                <label class="input-label">Qty Retur</label>
+                <input type="number" min="1" class="input-field" x-model="returForm.qty" required />
+              </div>
+              <div>
+                <label class="input-label">Alasan Retur</label>
+                <textarea class="input-field" rows="2" x-model="returForm.reason" placeholder="Mis. barang rusak / tidak sesuai pesanan"></textarea>
+              </div>
+              <div class="mt-5 flex justify-end gap-2">
+                <button type="button" class="btn btn-ghost" @click="closeReturModal()">Batal</button>
+                <button type="submit" class="btn btn-warning" :disabled="returSaving">
+                  <span x-show="!returSaving">Simpan Retur</span>
+                  <span x-show="returSaving">Menyimpan...</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div data-include="../components/toast.html"></div>
+  <div data-include="../components/modal.html"></div>
+</body>
+</html>

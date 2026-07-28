@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Persediaan — Modern Pharmacy Management System</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../js/tailwind.config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+
+  <script src="../js/config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/layout.js"></script>
+  <script src="../js/toast.js"></script>
+  <script src="../js/modal.js"></script>
+  <script src="../js/ui-components.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/stock.js"></script>
+</head>
+<body class="min-h-screen bg-surface font-sans text-slate-800 antialiased">
+  <script>Auth.requireAuth();</script>
+
+  <div x-data class="flex h-screen overflow-hidden">
+    <aside class="hidden lg:block" data-include="../components/sidebar.html"></aside>
+    <div x-show="$store.layout.sidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-slate-900/50 lg:hidden" style="display:none;" @click="$store.layout.closeSidebar()"></div>
+    <div x-show="$store.layout.sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="fixed inset-y-0 left-0 z-50 lg:hidden" style="display:none;" data-include="../components/sidebar.html"></div>
+
+    <div class="flex flex-1 flex-col overflow-hidden">
+      <div data-include="../components/navbar.html"></div>
+
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8" x-data="stockPage()" x-init="init()">
+        <div class="mx-auto max-w-5xl space-y-6">
+          <div>
+            <h1 class="text-xl font-semibold text-slate-900">Persediaan</h1>
+            <p class="mt-1 text-sm text-slate-500">Stock Masuk/Keluar, Opname, Transfer, Expired Monitoring, dan Riwayat Pergerakan.</p>
+          </div>
+
+          <!-- Tabs -->
+          <div class="flex flex-wrap gap-1 border-b border-slate-200">
+            <template x-for="tab in tabs" :key="tab.key">
+              <button
+                type="button"
+                class="border-b-2 px-3 py-2 text-sm font-medium"
+                :class="activeTab === tab.key ? 'border-primary-600 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'"
+                @click="setTab(tab.key)"
+                x-text="tab.label"
+              ></button>
+            </template>
+          </div>
+
+          <!-- Tab: Stock Masuk -->
+          <div x-show="activeTab === 'in'" class="app-card max-w-lg p-5">
+            <h2 class="mb-3 text-sm font-semibold text-slate-700">Stock Masuk</h2>
+            <div x-show="errorIn" x-transition class="mb-3 rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-700" x-text="errorIn" style="display:none;"></div>
+            <form @submit.prevent="submitIn()" class="space-y-3">
+              <div>
+                <label class="input-label">Obat</label>
+                <select class="input-field" x-model="formIn.medicine_id" required>
+                  <option value="">- Pilih Obat -</option>
+                  <template x-for="m in medicines" :key="m.id"><option :value="m.id" x-text="m.name + ' (stok: ' + m.stock + ')'"></option></template>
+                </select>
+              </div>
+              <div>
+                <label class="input-label">Qty Masuk</label>
+                <input type="number" min="1" class="input-field" x-model="formIn.qty" required />
+              </div>
+              <div>
+                <label class="input-label">Referensi</label>
+                <input type="text" class="input-field" x-model="formIn.reference" placeholder="Mis. no. dokumen internal" />
+              </div>
+              <div>
+                <label class="input-label">Catatan</label>
+                <textarea class="input-field" rows="2" x-model="formIn.notes"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-full" :disabled="savingIn">
+                <span x-show="!savingIn">Simpan Stock Masuk</span>
+                <span x-show="savingIn">Menyimpan...</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Tab: Stock Keluar -->
+          <div x-show="activeTab === 'out'" class="app-card max-w-lg p-5">
+            <h2 class="mb-3 text-sm font-semibold text-slate-700">Stock Keluar</h2>
+            <div x-show="errorOut" x-transition class="mb-3 rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-700" x-text="errorOut" style="display:none;"></div>
+            <form @submit.prevent="submitOut()" class="space-y-3">
+              <div>
+                <label class="input-label">Obat</label>
+                <select class="input-field" x-model="formOut.medicine_id" required>
+                  <option value="">- Pilih Obat -</option>
+                  <template x-for="m in medicines" :key="m.id"><option :value="m.id" x-text="m.name + ' (stok: ' + m.stock + ')'"></option></template>
+                </select>
+              </div>
+              <div>
+                <label class="input-label">Qty Keluar</label>
+                <input type="number" min="1" class="input-field" x-model="formOut.qty" required />
+              </div>
+              <div>
+                <label class="input-label">Referensi</label>
+                <input type="text" class="input-field" x-model="formOut.reference" placeholder="Mis. alasan pemakaian internal" />
+              </div>
+              <div>
+                <label class="input-label">Catatan</label>
+                <textarea class="input-field" rows="2" x-model="formOut.notes"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-full" :disabled="savingOut">
+                <span x-show="!savingOut">Simpan Stock Keluar</span>
+                <span x-show="savingOut">Menyimpan...</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Tab: Stock Opname -->
+          <div x-show="activeTab === 'opname'" class="app-card max-w-lg p-5">
+            <h2 class="mb-3 text-sm font-semibold text-slate-700">Stock Opname</h2>
+            <p class="mb-3 text-xs text-slate-500">Cocokkan stok sistem dengan hasil hitung fisik gudang. Selisih otomatis tercatat sebagai Adjustment di Riwayat Pergerakan.</p>
+            <div x-show="errorOpname" x-transition class="mb-3 rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-700" x-text="errorOpname" style="display:none;"></div>
+            <form @submit.prevent="submitOpname()" class="space-y-3">
+              <div>
+                <label class="input-label">Obat</label>
+                <select class="input-field" x-model="formOpname.medicine_id" required>
+                  <option value="">- Pilih Obat -</option>
+                  <template x-for="m in medicines" :key="m.id"><option :value="m.id" x-text="m.name + ' (stok sistem: ' + m.stock + ')'"></option></template>
+                </select>
+              </div>
+              <div>
+                <label class="input-label">Stok Fisik Hasil Hitung</label>
+                <input type="number" min="0" class="input-field" x-model="formOpname.physical_stock" required />
+              </div>
+              <div>
+                <label class="input-label">Catatan</label>
+                <textarea class="input-field" rows="2" x-model="formOpname.notes"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-full" :disabled="savingOpname">
+                <span x-show="!savingOpname">Simpan Stock Opname</span>
+                <span x-show="savingOpname">Menyimpan...</span>
+              </button>
+            </form>
+
+            <div x-show="opnameResult" class="mt-4 rounded-lg bg-slate-50 p-3 text-sm">
+              <p>Stok Sistem Sebelumnya: <span class="font-medium" x-text="opnameResult?.systemStock"></span></p>
+              <p>Stok Fisik: <span class="font-medium" x-text="opnameResult?.physicalStock"></span></p>
+              <p>Selisih: <span class="font-medium" :class="opnameResult?.difference < 0 ? 'text-danger-600' : 'text-success-600'" x-text="opnameResult?.difference"></span></p>
+            </div>
+          </div>
+
+          <!-- Tab: Transfer Stock -->
+          <div x-show="activeTab === 'transfer'" class="app-card max-w-lg p-5">
+            <h2 class="mb-3 text-sm font-semibold text-slate-700">Transfer Stock (Lokasi Rak)</h2>
+            <p class="mb-3 text-xs text-slate-500">Memindahkan lokasi penyimpanan obat di gudang/apotek yang sama.</p>
+            <div x-show="errorTransfer" x-transition class="mb-3 rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-700" x-text="errorTransfer" style="display:none;"></div>
+            <form @submit.prevent="submitTransfer()" class="space-y-3">
+              <div>
+                <label class="input-label">Obat</label>
+                <select class="input-field" x-model="formTransfer.medicine_id" required>
+                  <option value="">- Pilih Obat -</option>
+                  <template x-for="m in medicines" :key="m.id"><option :value="m.id" x-text="m.name"></option></template>
+                </select>
+              </div>
+              <div>
+                <label class="input-label">Lokasi Rak Tujuan</label>
+                <input type="text" class="input-field" x-model="formTransfer.to_location" placeholder="Mis. Rak A-3" required />
+              </div>
+              <div>
+                <label class="input-label">Catatan</label>
+                <textarea class="input-field" rows="2" x-model="formTransfer.notes"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-full" :disabled="savingTransfer">
+                <span x-show="!savingTransfer">Simpan Transfer</span>
+                <span x-show="savingTransfer">Menyimpan...</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Tab: Expired Monitoring -->
+          <div x-show="activeTab === 'expired'" class="space-y-4">
+            <div class="app-card p-5">
+              <h2 class="mb-3 text-sm font-semibold text-slate-700">Mendekati Expired (≤30 hari)</h2>
+              <template x-if="!loadingExpired && nearExpiry.length === 0"><p class="text-sm text-slate-400">Tidak ada obat mendekati expired.</p></template>
+              <template x-for="item in nearExpiry" :key="item.name + item.expiredDate">
+                <div class="activity-item flex items-center gap-3 border-b border-slate-100 py-2 last:border-none">
+                  <span class="badge badge-warning" x-text="item.daysLeft + ' hari'"></span>
+                  <span class="flex-1 text-sm text-slate-700" x-text="item.name"></span>
+                  <span class="text-xs text-slate-400" x-text="formatDate(item.expiredDate)"></span>
+                </div>
+              </template>
+            </div>
+            <div class="app-card p-5">
+              <h2 class="mb-3 text-sm font-semibold text-slate-700">Sudah Expired (stok &gt; 0)</h2>
+              <template x-if="!loadingExpired && expired.length === 0"><p class="text-sm text-slate-400">Tidak ada obat expired dengan stok tersisa.</p></template>
+              <template x-for="item in expired" :key="item.id">
+                <div class="flex items-center gap-3 border-b border-slate-100 py-2 last:border-none">
+                  <span class="badge badge-danger">Expired</span>
+                  <span class="flex-1 text-sm text-slate-700" x-text="item.name"></span>
+                  <span class="text-xs text-slate-400" x-text="'Stok: ' + item.stock + ' — ' + formatDate(item.expiredDate)"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- Tab: Riwayat Pergerakan -->
+          <div x-show="activeTab === 'history'" class="space-y-4">
+            <div class="relative w-full sm:max-w-xs">
+              <input type="text" class="input-field" placeholder="Cari obat / referensi..." x-model="historySearch" @input="onHistorySearchInput()" />
+            </div>
+            <div class="app-card overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                  <thead class="border-b border-slate-100 bg-slate-50/60 text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <tr>
+                      <th class="px-4 py-3">Tanggal</th>
+                      <th class="px-4 py-3">Obat</th>
+                      <th class="px-4 py-3">Tipe</th>
+                      <th class="px-4 py-3 text-right">Qty</th>
+                      <th class="px-4 py-3">Referensi</th>
+                      <th class="px-4 py-3">Catatan</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    <template x-if="historyLoading">
+                      <tr><td class="px-4 py-3" colspan="6"><div class="skeleton-line"></div></td></tr>
+                    </template>
+                    <template x-if="!historyLoading">
+                      <template x-for="row in history" :key="row.id">
+                        <tr class="hover:bg-slate-50/70">
+                          <td class="px-4 py-3 text-slate-600" x-text="formatDate(row.date)"></td>
+                          <td class="px-4 py-3 text-slate-700" x-text="row.medicine_name"></td>
+                          <td class="px-4 py-3"><span class="badge badge-neutral" x-text="movementTypeLabel(row.type)"></span></td>
+                          <td class="px-4 py-3 text-right" :class="row.qty < 0 ? 'text-danger-600' : 'text-success-600'" x-text="(row.qty > 0 ? '+' : '') + row.qty"></td>
+                          <td class="px-4 py-3 text-slate-500" x-text="row.reference"></td>
+                          <td class="px-4 py-3 text-slate-500" x-text="row.notes"></td>
+                        </tr>
+                      </template>
+                    </template>
+                    <template x-if="!historyLoading && history.length === 0">
+                      <tr><td class="px-4 py-8 text-center text-slate-400" colspan="6">Belum ada pergerakan stok tercatat</td></tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="flex items-center justify-end gap-1">
+              <button type="button" class="pagination-btn" :disabled="historyPage === 1" @click="goToHistoryPage(historyPage - 1)">‹</button>
+              <span class="px-2 text-sm text-slate-500" x-text="historyPage + ' / ' + historyTotalPages"></span>
+              <button type="button" class="pagination-btn" :disabled="historyPage === historyTotalPages" @click="goToHistoryPage(historyPage + 1)">›</button>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div data-include="../components/toast.html"></div>
+  <div data-include="../components/modal.html"></div>
+</body>
+</html>

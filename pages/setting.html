@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Setting — Modern Pharmacy Management System</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../js/tailwind.config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+
+  <script src="../js/config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/layout.js"></script>
+  <script src="../js/toast.js"></script>
+  <script src="../js/modal.js"></script>
+  <script src="../js/ui-components.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/setting.js"></script>
+</head>
+<body class="min-h-screen bg-surface font-sans text-slate-800 antialiased">
+  <!-- Hanya admin & owner yang boleh mengubah pengaturan / backup-restore -->
+  <script>Auth.requireAuth(["admin", "owner"]);</script>
+
+  <div x-data class="flex h-screen overflow-hidden">
+    <aside class="hidden lg:block" data-include="../components/sidebar.html"></aside>
+    <div x-show="$store.layout.sidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-slate-900/50 lg:hidden" style="display:none;" @click="$store.layout.closeSidebar()"></div>
+    <div x-show="$store.layout.sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="fixed inset-y-0 left-0 z-50 lg:hidden" style="display:none;" data-include="../components/sidebar.html"></div>
+
+    <div class="flex flex-1 flex-col overflow-hidden">
+      <div data-include="../components/navbar.html"></div>
+
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8" x-data="settingPage()" x-init="init()">
+        <div class="mx-auto max-w-3xl space-y-6">
+          <div>
+            <h1 class="text-xl font-semibold text-slate-900">Setting</h1>
+            <p class="mt-1 text-sm text-slate-500">Profil apotek, pajak default, backup dan restore data.</p>
+          </div>
+
+          <!-- Tabs -->
+          <div class="flex gap-1 border-b border-slate-200">
+            <template x-for="tab in tabs" :key="tab.key">
+              <button
+                type="button"
+                class="border-b-2 px-4 py-2 text-sm font-medium"
+                :class="activeTab === tab.key ? 'border-primary-600 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'"
+                @click="setTab(tab.key)"
+                x-text="tab.label"
+              ></button>
+            </template>
+          </div>
+
+          <!-- Tab: Profil Apotek -->
+          <div x-show="activeTab === 'profile'" class="app-card p-5">
+            <div x-show="formError" x-transition class="mb-3 rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-700" x-text="formError" style="display:none;"></div>
+            <form @submit.prevent="saveProfile()" class="space-y-3">
+              <div>
+                <label class="input-label">Nama Apotek <span class="text-danger-600">*</span></label>
+                <input type="text" class="input-field" x-model="form.store_name" required />
+              </div>
+              <div>
+                <label class="input-label">Logo (URL Gambar)</label>
+                <input type="text" class="input-field" x-model="form.logo_url" placeholder="https://..." />
+              </div>
+              <div>
+                <label class="input-label">Alamat</label>
+                <textarea class="input-field" rows="2" x-model="form.address"></textarea>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="input-label">Telepon</label>
+                  <input type="text" class="input-field" x-model="form.phone" />
+                </div>
+                <div>
+                  <label class="input-label">Pajak Default (%)</label>
+                  <input type="number" min="0" class="input-field" x-model="form.tax_percent" />
+                </div>
+              </div>
+              <div>
+                <label class="input-label">Nama/Model Printer Struk</label>
+                <input type="text" class="input-field" x-model="form.printer_name" placeholder="Mis. Epson TM-T82" />
+              </div>
+
+              <button type="submit" class="btn btn-primary" :disabled="saving">
+                <span x-show="!saving">Simpan Pengaturan</span>
+                <span x-show="saving">Menyimpan...</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Tab: Backup -->
+          <div x-show="activeTab === 'backup'" class="app-card p-5">
+            <h2 class="mb-2 text-sm font-semibold text-slate-700">Backup Data</h2>
+            <p class="mb-4 text-sm text-slate-500">
+              Mengunduh salinan SELURUH data (semua Spreadsheet modul yang sudah dikonfigurasi) sebagai satu file
+              <code>.json</code>. Simpan file ini di tempat aman secara berkala.
+            </p>
+            <button type="button" class="btn btn-primary" :disabled="backupRunning" @click="runBackup()">
+              <span x-show="!backupRunning">Unduh Backup Sekarang</span>
+              <span x-show="backupRunning">Menyiapkan backup...</span>
+            </button>
+          </div>
+
+          <!-- Tab: Restore -->
+          <div x-show="activeTab === 'restore'" class="app-card p-5">
+            <h2 class="mb-2 text-sm font-semibold text-slate-700">Restore Data</h2>
+            <p class="mb-4 text-sm text-danger-600">
+              Peringatan: proses ini akan MENIMPA data yang ada saat ini dengan isi file backup. Pastikan file yang
+              diunggah benar dan tindakan ini disengaja.
+            </p>
+            <input type="file" accept=".json" class="input-field" @change="onRestoreFileChange($event)" />
+            <button type="button" class="btn btn-danger mt-3" :disabled="restoreRunning" @click="confirmRestore()">
+              <span x-show="!restoreRunning">Mulai Restore</span>
+              <span x-show="restoreRunning">Memproses restore...</span>
+            </button>
+
+            <div x-show="restoreSummary" class="mt-4 space-y-1 rounded-lg bg-slate-50 p-3 text-sm">
+              <template x-for="(status, moduleName) in restoreSummary" :key="moduleName">
+                <p><span class="font-medium" x-text="moduleName"></span>: <span x-text="status"></span></p>
+              </template>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div data-include="../components/toast.html"></div>
+  <div data-include="../components/modal.html"></div>
+</body>
+</html>

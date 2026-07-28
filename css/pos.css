@@ -1,0 +1,39 @@
+/**
+ * pos.css
+ * -----------------------------------------------------------------------
+ * Style khusus halaman Kasir (POS): tinggi area cart yang bisa di-scroll
+ * terpisah dari daftar obat, serta aturan @media print untuk Cetak Struk
+ * — saat window.print() dipanggil, HANYA elemen #receipt yang tercetak,
+ * seluruh shell aplikasi (sidebar/navbar/dst) disembunyikan otomatis.
+ * -----------------------------------------------------------------------
+ */
+
+.pos-medicine-list,
+.pos-cart-list {
+  max-height: calc(100vh - 320px);
+  overflow-y: auto;
+}
+
+.receipt-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  padding: 0.125rem 0;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #receipt,
+  #receipt * {
+    visibility: visible;
+  }
+  #receipt {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 0;
+  }
+}

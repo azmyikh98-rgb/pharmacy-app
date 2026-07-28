@@ -1,0 +1,42 @@
+<!--
+  modal.html
+  -----------------------------------------------------------------------
+  Berisi DUA hal, di-include SEKALI saja per halaman (biasanya lewat
+  index.html / layout shell utama):
+
+  1. Confirm Dialog global — dikendalikan oleh Alpine.store('confirm')
+     (lihat js/modal.js). Dipanggil dari mana saja lewat:
+       Confirm.ask({ title, message, onConfirm })
+
+  2. Contoh shell modal generik (.modal-backdrop/.modal-panel) sebagai
+     REFERENSI VISUAL. Modul bisnis nanti (form tambah obat, dsb, mulai
+     Tahap 5) membuat x-data lokalnya sendiri dan cukup memakai class yang
+     sama supaya tampilan konsisten tanpa berbagi satu state global yang
+     rawan konflik antar form.
+-->
+
+<!-- 1. Confirm Dialog global -->
+<div
+  x-data
+  x-show="$store.confirm.isOpen"
+  x-transition.opacity
+  class="modal-backdrop"
+  style="display: none;"
+  @keydown.escape.window="$store.confirm.cancel()"
+>
+  <div class="modal-panel max-w-sm" @click.outside="$store.confirm.cancel()">
+    <h3 class="text-base font-semibold text-slate-900" x-text="$store.confirm.title"></h3>
+    <p class="mt-2 text-sm text-slate-500" x-text="$store.confirm.message"></p>
+    <div class="mt-5 flex justify-end gap-2">
+      <button type="button" class="btn btn-ghost" @click="$store.confirm.cancel()">Batal</button>
+      <button
+        type="button"
+        class="btn"
+        :class="$store.confirm.variant === 'danger' ? 'btn-danger' : $store.confirm.variant === 'warning' ? 'btn-warning' : 'btn-primary'"
+        @click="$store.confirm.confirm()"
+      >
+        Ya, Lanjutkan
+      </button>
+    </div>
+  </div>
+</div>

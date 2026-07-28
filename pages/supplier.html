@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supplier — Modern Pharmacy Management System</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../js/tailwind.config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+
+  <script src="../js/config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/layout.js"></script>
+  <script src="../js/toast.js"></script>
+  <script src="../js/modal.js"></script>
+  <script src="../js/ui-components.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/crud-page.js"></script>
+  <script src="../js/supplier.js"></script>
+</head>
+<body class="min-h-screen bg-surface font-sans text-slate-800 antialiased">
+  <script>Auth.requireAuth();</script>
+
+  <div x-data class="flex h-screen overflow-hidden">
+    <aside class="hidden lg:block" data-include="../components/sidebar.html"></aside>
+    <div x-show="$store.layout.sidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-slate-900/50 lg:hidden" style="display:none;" @click="$store.layout.closeSidebar()"></div>
+    <div x-show="$store.layout.sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="fixed inset-y-0 left-0 z-50 lg:hidden" style="display:none;" data-include="../components/sidebar.html"></div>
+
+    <div class="flex flex-1 flex-col overflow-hidden">
+      <div data-include="../components/navbar.html"></div>
+
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8" x-data="supplierPage()" x-init="init()">
+        <div class="mx-auto max-w-6xl space-y-6">
+          <div>
+            <h1 class="text-xl font-semibold text-slate-900">Master Data — Supplier</h1>
+            <p class="mt-1 text-sm text-slate-500">Kelola data supplier obat.</p>
+          </div>
+
+          <div data-include="../components/crud-table.html"></div>
+        </div>
+
+        <!-- Modal Form -->
+        <div x-show="showModal" x-transition.opacity class="modal-backdrop" style="display: none;" @keydown.escape.window="closeModal()">
+          <div class="modal-panel max-w-lg" @click.outside="closeModal()">
+            <h3 class="text-base font-semibold text-slate-900" x-text="isEdit ? 'Edit Supplier' : 'Tambah Supplier'"></h3>
+
+            <div x-show="formError" x-transition class="mt-3 rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-700" x-text="formError" style="display:none;"></div>
+
+            <form @submit.prevent="submitForm()" class="mt-4 space-y-3">
+              <div>
+                <label class="input-label">Nama Supplier <span class="text-danger-600">*</span></label>
+                <input type="text" class="input-field" x-model="form.name" required />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="input-label">PIC</label>
+                  <input type="text" class="input-field" x-model="form.pic" />
+                </div>
+                <div>
+                  <label class="input-label">Telepon</label>
+                  <input type="text" class="input-field" x-model="form.phone" />
+                </div>
+              </div>
+              <div>
+                <label class="input-label">Alamat</label>
+                <input type="text" class="input-field" x-model="form.address" />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="input-label">Email</label>
+                  <input type="email" class="input-field" x-model="form.email" />
+                </div>
+                <div>
+                  <label class="input-label">NPWP</label>
+                  <input type="text" class="input-field" x-model="form.npwp" />
+                </div>
+              </div>
+              <div>
+                <label class="input-label">Status</label>
+                <select class="input-field" x-model="form.status">
+                  <option value="active">Aktif</option>
+                  <option value="inactive">Nonaktif</option>
+                </select>
+              </div>
+
+              <div class="mt-5 flex justify-end gap-2">
+                <button type="button" class="btn btn-ghost" @click="closeModal()">Batal</button>
+                <button type="submit" class="btn btn-primary" :disabled="saving">
+                  <span x-show="!saving">Simpan</span>
+                  <span x-show="saving">Menyimpan...</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div data-include="../components/toast.html"></div>
+  <div data-include="../components/modal.html"></div>
+</body>
+</html>

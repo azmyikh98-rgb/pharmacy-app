@@ -1,0 +1,18 @@
+# Dependency / build artifact (untuk pengembangan lanjutan jika ada tooling)
+node_modules/
+dist/
+
+# File environment lokal (jangan pernah commit URL/API key sensitif)
+.env
+.env.local
+
+# File sistem operasi
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Log
+*.log

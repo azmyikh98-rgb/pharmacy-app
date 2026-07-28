@@ -1,0 +1,244 @@
+/**
+ * style.css
+ * -----------------------------------------------------------------------
+ * Base style untuk seluruh aplikasi. File ini HANYA berisi:
+ *  - CSS variable dasar (token warna & spacing dari brief)
+ *  - Reset/normalize kecil yang tidak ter-cover Tailwind
+ *  - Utility class yang dipakai lintas modul (card, glass effect)
+ *
+ * Style khusus per halaman (mis. dashboard.css, medicine.css) akan
+ * dibuat terpisah mulai Tahap 4 & Tahap 5, tidak ditumpuk di sini.
+ * -----------------------------------------------------------------------
+ */
+
+:root {
+  /* Palet warna sesuai spesifikasi desain */
+  --color-primary: #2563eb;
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+  --color-warning: #f59e0b;
+  --color-bg: #f8fafc;
+  --color-sidebar: #0f172a;
+  --color-card: #ffffff;
+
+  /* Grid spacing 8px sesuai brief */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  background-color: var(--color-bg);
+}
+
+/* Scrollbar tipis, konsisten dengan estetika SaaS modern */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Utility: Card dasar (dipakai di semua modul sebagai wadah konten) */
+.app-card {
+  background-color: var(--color-card);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+/* Utility: Glass effect ringan (dipakai terbatas, mis. navbar/modal overlay) */
+.app-glass {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Fokus keyboard tetap terlihat jelas (aksesibilitas), jangan dihapus */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* =========================================================================
+   DESIGN SYSTEM — TAHAP 2
+   Class di bawah ini adalah "Reusable Button / Form / Card / Notification"
+   sesuai Code Standard di brief. Semua halaman & komponen WAJIB memakai
+   class ini, bukan menulis utility Tailwind mentah berulang-ulang untuk
+   elemen yang sama (button, input, badge, dst).
+   ========================================================================= */
+
+/* --- Button --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border-radius: 0.625rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary { background-color: var(--color-primary); color: #fff; }
+.btn-primary:hover:not(:disabled) { background-color: #1d4ed8; }
+.btn-success { background-color: var(--color-success); color: #fff; }
+.btn-success:hover:not(:disabled) { background-color: #15803d; }
+.btn-danger { background-color: var(--color-danger); color: #fff; }
+.btn-danger:hover:not(:disabled) { background-color: #b91c1c; }
+.btn-warning { background-color: var(--color-warning); color: #fff; }
+.btn-warning:hover:not(:disabled) { background-color: #b45309; }
+.btn-outline { background-color: transparent; color: var(--color-primary); border: 1px solid #dbeafe; }
+.btn-outline:hover:not(:disabled) { background-color: #eff6ff; }
+.btn-ghost { background-color: transparent; color: #475569; }
+.btn-ghost:hover:not(:disabled) { background-color: #f1f5f9; }
+
+/* --- Badge (status obat, status transaksi, dsb) --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.badge-success { background-color: #f0fdf4; color: #15803d; }
+.badge-danger  { background-color: #fef2f2; color: #b91c1c; }
+.badge-warning { background-color: #fffbeb; color: #b45309; }
+.badge-neutral { background-color: #f1f5f9; color: #475569; }
+
+/* --- Form input (Reusable Form) --- */
+.input-field {
+  width: 100%;
+  border-radius: 0.625rem;
+  border: 1px solid #e2e8f0;
+  background-color: #fff;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #1e293b;
+}
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+.input-label {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #334155;
+}
+.input-error {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-danger);
+}
+
+/* --- Sidebar link (dipakai di components/sidebar.html) --- */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0.625rem;
+  padding: 0.55rem 0.75rem;
+  color: #cbd5e1;
+  font-weight: 500;
+}
+.sidebar-link:hover { background-color: rgba(255, 255, 255, 0.06); color: #fff; }
+.sidebar-link-active { background-color: var(--color-primary); color: #fff; }
+.sidebar-icon { height: 1.15rem; width: 1.15rem; flex-shrink: 0; }
+.sidebar-sublink {
+  display: block;
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  color: #94a3b8;
+  font-size: 0.8125rem;
+}
+.sidebar-sublink:hover { color: #fff; background-color: rgba(255, 255, 255, 0.06); }
+
+/* --- Modal shell (Reusable Modal) --- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(15, 23, 42, 0.45);
+  padding: 1rem;
+}
+.modal-panel {
+  width: 100%;
+  max-width: 32rem;
+  border-radius: var(--radius-lg);
+  background-color: #fff;
+  padding: 1.5rem;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.18);
+}
+
+/* --- Toast (Reusable Notification) --- */
+.toast-item {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+.toast-success { background-color: #16a34a; color: #fff; }
+.toast-danger  { background-color: #dc2626; color: #fff; }
+.toast-warning { background-color: #f59e0b; color: #fff; }
+.toast-info    { background-color: #1e293b; color: #fff; }
+
+/* --- Skeleton loading --- */
+.skeleton-line, .skeleton-block, .skeleton-circle {
+  background-color: #e2e8f0;
+  border-radius: 0.375rem;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+.skeleton-line { height: 0.75rem; width: 100%; }
+.skeleton-block { border-radius: 0.75rem; }
+.skeleton-circle { height: 2.5rem; width: 2.5rem; border-radius: 9999px; flex-shrink: 0; }
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* --- Pagination --- */
+.pagination-btn {
+  display: inline-flex;
+  height: 2rem;
+  min-width: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  padding: 0 0.5rem;
+  font-size: 0.8125rem;
+  color: #475569;
+}
+.pagination-btn:hover:not(:disabled) { background-color: #f1f5f9; }
+.pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pagination-btn-active { background-color: var(--color-primary); color: #fff; }

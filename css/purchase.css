@@ -1,0 +1,18 @@
+/**
+ * purchase.css
+ * -----------------------------------------------------------------------
+ * Style khusus halaman Pembelian: tabel baris item obat di dalam modal
+ * Purchase Order (tidak dipakai halaman lain, jadi tidak masuk style.css).
+ * -----------------------------------------------------------------------
+ */
+
+.item-row-table th,
+.item-row-table td {
+  padding: 0.5rem 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.item-row-table input,
+.item-row-table select {
+  width: 100%;
+}

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Riwayat Penjualan — Modern Pharmacy Management System</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../js/tailwind.config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+
+  <script src="../js/config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/layout.js"></script>
+  <script src="../js/toast.js"></script>
+  <script src="../js/modal.js"></script>
+  <script src="../js/ui-components.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/sales.js"></script>
+</head>
+<body class="min-h-screen bg-surface font-sans text-slate-800 antialiased">
+  <script>Auth.requireAuth();</script>
+
+  <div x-data class="flex h-screen overflow-hidden">
+    <aside class="hidden lg:block" data-include="../components/sidebar.html"></aside>
+    <div x-show="$store.layout.sidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-slate-900/50 lg:hidden" style="display:none;" @click="$store.layout.closeSidebar()"></div>
+    <div x-show="$store.layout.sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="fixed inset-y-0 left-0 z-50 lg:hidden" style="display:none;" data-include="../components/sidebar.html"></div>
+
+    <div class="flex flex-1 flex-col overflow-hidden">
+      <div data-include="../components/navbar.html"></div>
+
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8" x-data="salesPage()" x-init="init()">
+        <div class="mx-auto max-w-6xl space-y-6">
+          <div>
+            <h1 class="text-xl font-semibold text-slate-900">Riwayat Penjualan</h1>
+            <p class="mt-1 text-sm text-slate-500">Daftar transaksi POS dan retur penjualan.</p>
+          </div>
+
+          <div class="relative w-full sm:max-w-xs">
+            <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+            <input type="text" class="input-field pl-9" placeholder="Cari no. invoice / customer..." x-model="search" @input="onSearchInput()" />
+          </div>
+
+          <div class="app-card overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="border-b border-slate-100 bg-slate-50/60 text-xs font-medium uppercase tracking-wide text-slate-500">
+                  <tr>
+                    <th class="px-4 py-3">No. Invoice</th>
+                    <th class="px-4 py-3">Tanggal</th>
+                    <th class="px-4 py-3">Customer</th>
+                    <th class="px-4 py-3 text-right">Total</th>
+                    <th class="px-4 py-3">Bayar</th>
+                    <th class="px-4 py-3">Kasir</th>
+                    <th class="px-4 py-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <template x-if="loading">
+                    <template x-for="i in 3" :key="i">
+                      <tr><td class="px-4 py-3" colspan="7"><div class="skeleton-line"></div></td></tr>
+                    </template>
+                  </template>
+
+                  <template x-if="!loading">
+                    <template x-for="row in rows" :key="row.id">
+                      <tr class="hover:bg-slate-50/70">
+                        <td class="px-4 py-3 font-medium text-slate-700" x-text="row.invoice_number"></td>
+                        <td class="px-4 py-3 text-slate-600" x-text="formatDate(row.date)"></td>
+                        <td class="px-4 py-3 text-slate-600" x-text="row.customer_name"></td>
+                        <td class="px-4 py-3 text-right text-slate-700" x-text="formatRupiah(row.total)"></td>
+                        <td class="px-4 py-3"><span class="badge badge-neutral" x-text="row.payment_method"></span></td>
+                        <td class="px-4 py-3 text-slate-500" x-text="row.cashier"></td>
+                        <td class="whitespace-nowrap px-4 py-3 text-right">
+                          <button type="button" class="btn btn-ghost" @click="openDetail(row)">Detail</button>
+                          <button type="button" class="btn btn-ghost text-warning-600" @click="openRetur(row)">Retur</button>
+                        </td>
+                      </tr>
+                    </template>
+                  </template>
+
+                  <template x-if="!loading && rows.length === 0">
+                    <tr><td class="px-4 py-8 text-center text-slate-400" colspan="7">Belum ada transaksi penjualan</td></tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-center justify-between gap-3 px-1 py-1 text-sm text-slate-500 sm:flex-row">
+            <p>
+              Menampilkan
+              <span class="font-medium text-slate-700" x-text="total === 0 ? 0 : (page - 1) * pageSize + 1"></span>
+              –
+              <span class="font-medium text-slate-700" x-text="Math.min(page * pageSize, total)"></span>
+              dari
+              <span class="font-medium text-slate-700" x-text="total"></span> data
+            </p>
+            <div class="flex items-center gap-1">
+              <button type="button" class="pagination-btn" :disabled="page === 1" @click="prevPage()">‹</button>
+              <template x-for="p in pageNumbers" :key="p">
+                <button type="button" class="pagination-btn" :class="p === page && 'pagination-btn-active'" @click="goToPage(p)" x-text="p"></button>
+              </template>
+              <button type="button" class="pagination-btn" :disabled="page === totalPages" @click="nextPage()">›</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Detail -->
+        <div x-show="showDetailModal" x-transition.opacity class="modal-backdrop" style="display: none;" @keydown.escape.window="closeDetail()">
+          <div class="modal-panel max-w-lg" @click.outside="closeDetail()">
+            <h3 class="text-base font-semibold text-slate-900">Detail Transaksi <span x-text="detail?.invoice_number"></span></h3>
+            <div class="mt-3 divide-y divide-slate-100 text-sm">
+              <template x-for="item in detail?.items || []" :key="item.medicine_id">
+                <div class="flex justify-between py-2">
+                  <span x-text="item.medicine_name + ' x' + item.qty"></span>
+                  <span x-text="formatRupiah(item.qty * item.price)"></span>
+                </div>
+              </template>
+            </div>
+            <div class="mt-3 space-y-1 rounded-lg bg-slate-50 p-3 text-sm">
+              <div class="flex justify-between"><span class="text-slate-500">Subtotal</span><span x-text="formatRupiah(detail?.subtotal)"></span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Diskon + Voucher</span><span x-text="formatRupiah((detail?.discount || 0) + (detail?.voucher || 0))"></span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Pajak</span><span x-text="formatRupiah(detail?.tax)"></span></div>
+              <div class="flex justify-between font-semibold text-slate-900"><span>Total</span><span x-text="formatRupiah(detail?.total)"></span></div>
+            </div>
+            <div class="mt-4 flex justify-end">
+              <button type="button" class="btn btn-ghost" @click="closeDetail()">Tutup</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Retur -->
+        <div x-show="showReturModal" x-transition.opacity class="modal-backdrop" style="display: none;" @keydown.escape.window="closeReturModal()">
+          <div class="modal-panel max-w-md" @click.outside="closeReturModal()">
+            <h3 class="text-base font-semibold text-slate-900">Retur Penjualan</h3>
+            <div x-show="returError" x-transition class="mt-3 rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-700" x-text="returError" style="display:none;"></div>
+
+            <form @submit.prevent="submitRetur()" class="mt-4 space-y-3">
+              <div>
+                <label class="input-label">Obat</label>
+                <select class="input-field" x-model="returForm.medicine_id" required>
+                  <template x-for="item in returItems" :key="item.medicine_id"><option :value="item.medicine_id" x-text="item.medicine_name"></option></template>
+                </select>
+              </div>
+              <div>
+                <label class="input-label">Qty Retur</label>
+                <input type="number" min="1" class="input-field" x-model="returForm.qty" required />
+              </div>
+              <div>
+                <label class="input-label">Alasan Retur</label>
+                <textarea class="input-field" rows="2" x-model="returForm.reason" placeholder="Mis. obat tidak sesuai / customer batal"></textarea>
+              </div>
+              <div class="mt-5 flex justify-end gap-2">
+                <button type="button" class="btn btn-ghost" @click="closeReturModal()">Batal</button>
+                <button type="submit" class="btn btn-warning" :disabled="returSaving">
+                  <span x-show="!returSaving">Simpan Retur</span>
+                  <span x-show="returSaving">Menyimpan...</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div data-include="../components/toast.html"></div>
+  <div data-include="../components/modal.html"></div>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!--
+  navbar.html
+  -----------------------------------------------------------------------
+  Navbar atas, sticky, reusable lewat:
+    <div data-include="components/navbar.html"></div>
+  Berisi: tombol toggle sidebar (mobile), global search, notifikasi,
+  dan dropdown profil user. Data user (nama, role) masih placeholder
+  karena modul Authentication baru dibangun di Tahap 3.
+-->
+<header class="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-slate-100 bg-white/80 px-4 app-glass sm:px-6">
+  <!-- Toggle sidebar (mobile) -->
+  <button
+    type="button"
+    @click="$store.layout.toggleSidebar()"
+    class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden"
+    aria-label="Buka menu"
+  >
+    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+  </button>
+
+  <!-- Global search -->
+  <div class="relative hidden flex-1 max-w-md sm:block">
+    <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+    <input
+      type="text"
+      placeholder="Cari obat, transaksi, atau menu..."
+      class="input-field pl-9"
+    />
+  </div>
+
+  <div class="flex-1 sm:hidden"></div>
+
+  <!-- Right actions -->
+  <div class="flex items-center gap-2">
+    <!-- Notification -->
+    <div x-data="{ openNotif: false }" class="relative">
+      <button
+        type="button"
+        @click="openNotif = !openNotif"
+        @click.outside="openNotif = false"
+        class="relative rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+        aria-label="Notifikasi"
+      >
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/></svg>
+        <span class="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-danger-600"></span>
+      </button>
+      <div
+        x-show="openNotif"
+        x-transition
+        class="app-card absolute right-0 mt-2 w-72 p-2 text-sm"
+        style="display: none;"
+      >
+        <p class="px-2 py-1.5 text-xs font-medium text-slate-400">Notifikasi (contoh — data asli mulai Tahap 4)</p>
+        <a href="#" class="block rounded-lg px-2 py-2 hover:bg-slate-50">3 obat mendekati expired</a>
+        <a href="#" class="block rounded-lg px-2 py-2 hover:bg-slate-50">5 obat di bawah stok minimum</a>
+      </div>
+    </div>
+
+    <!-- User dropdown -->
+    <div x-data="{ openUser: false, user: Auth.getUser() }" class="relative">
+      <button
+        type="button"
+        @click="openUser = !openUser"
+        @click.outside="openUser = false"
+        class="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-100"
+      >
+        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-700" x-text="(user?.name || 'U').slice(0, 2).toUpperCase()"></div>
+        <span class="hidden text-sm font-medium text-slate-700 sm:block" x-text="user?.name || 'User'"></span>
+        <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+      </button>
+      <div
+        x-show="openUser"
+        x-transition
+        class="app-card absolute right-0 mt-2 w-48 p-1.5 text-sm"
+        style="display: none;"
+      >
+        <p class="px-3 pb-1 pt-2 text-xs text-slate-400">Role: <span class="font-medium text-slate-600" x-text="user?.role || '-'"></span></p>
+        <a href="#" class="block rounded-lg px-3 py-2 hover:bg-slate-50">Profil</a>
+        <a href="#" class="block rounded-lg px-3 py-2 hover:bg-slate-50">Ganti Password</a>
+        <hr class="my-1 border-slate-100" />
+        <a href="#" @click.prevent="Auth.logout()" class="block rounded-lg px-3 py-2 text-danger-600 hover:bg-danger-50">Keluar</a>
+      </div>
+    </div>
+  </div>
+</header>

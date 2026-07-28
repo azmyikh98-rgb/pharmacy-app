@@ -1,0 +1,14 @@
+/**
+ * medicine.css
+ * -----------------------------------------------------------------------
+ * Style khusus halaman Obat. Form Tambah/Edit Obat jauh lebih panjang
+ * dari modul master data lain, jadi modal-backdrop di halaman ini perlu
+ * bisa di-scroll (items-start + overflow-y-auto sudah ditambahkan lewat
+ * class Tailwind langsung di medicine.html) — file ini hanya menaikkan
+ * sedikit jarak vertikal antar section form supaya tidak terlalu padat.
+ * -----------------------------------------------------------------------
+ */
+
+#medicine-form-sections > * + * {
+  margin-top: 1rem;
+}

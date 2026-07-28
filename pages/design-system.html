@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design System — Modern Pharmacy Management System</title>
+
+  <!-- Tailwind CSS + konfigurasi custom (WAJIB berurutan seperti ini) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../js/tailwind.config.js"></script>
+
+  <!-- Alpine JS -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+  <!-- Font Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../css/style.css" />
+
+  <!-- Urutan load penting: config -> utils -> api -> layout -> components -> toast -> modal -> ui-components -->
+  <script src="../js/config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/layout.js"></script>
+  <script src="../js/toast.js"></script>
+  <script src="../js/modal.js"></script>
+  <script src="../js/ui-components.js"></script>
+  <script src="../js/components.js"></script>
+</head>
+<body class="min-h-screen bg-surface font-sans text-slate-800 antialiased">
+
+  <!--
+    Halaman ini adalah PREVIEW DESIGN SYSTEM untuk Tahap 2.
+    Mulai Tahap 3, index.html akan diganti fungsinya menjadi entry point
+    yang mengecek status login lalu redirect ke pages/login.html atau
+    pages/dashboard.html. Layout shell (sidebar+navbar) di bawah ini akan
+    dipakai ulang oleh SEMUA halaman pages/*.html mulai Tahap 4.
+  -->
+  <div x-data class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar: desktop selalu tampil, mobile via overlay -->
+    <aside class="hidden lg:block" data-include="../components/sidebar.html"></aside>
+    <div
+      x-show="$store.layout.sidebarOpen"
+      x-transition.opacity
+      class="fixed inset-0 z-40 bg-slate-900/50 lg:hidden"
+      style="display: none;"
+      @click="$store.layout.closeSidebar()"
+    ></div>
+    <div
+      x-show="$store.layout.sidebarOpen"
+      x-transition:enter="transition ease-out duration-200"
+      x-transition:enter-start="-translate-x-full"
+      x-transition:enter-end="translate-x-0"
+      x-transition:leave="transition ease-in duration-150"
+      x-transition:leave-start="translate-x-0"
+      x-transition:leave-end="-translate-x-full"
+      class="fixed inset-y-0 left-0 z-50 lg:hidden"
+      style="display: none;"
+      data-include="../components/sidebar.html"
+    ></div>
+
+    <!-- Main -->
+    <div class="flex flex-1 flex-col overflow-hidden">
+      <div data-include="../components/navbar.html"></div>
+
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <div class="mx-auto max-w-6xl space-y-10">
+
+          <div>
+            <h1 class="text-xl font-semibold text-slate-900">Design System Preview</h1>
+            <p class="mt-1 text-sm text-slate-500">
+              Tahap 2 — semua komponen di bawah ini reusable dan akan dipakai ulang mulai Tahap 3.
+            </p>
+          </div>
+
+          <!-- Buttons -->
+          <section class="app-card p-5">
+            <h2 class="mb-4 text-sm font-semibold text-slate-700">Button</h2>
+            <div class="flex flex-wrap gap-2">
+              <button class="btn btn-primary">Simpan</button>
+              <button class="btn btn-success">Approve</button>
+              <button class="btn btn-danger">Hapus</button>
+              <button class="btn btn-warning">Peringatan</button>
+              <button class="btn btn-outline">Outline</button>
+              <button class="btn btn-ghost">Batal</button>
+            </div>
+          </section>
+
+          <!-- Badges -->
+          <section class="app-card p-5">
+            <h2 class="mb-4 text-sm font-semibold text-slate-700">Badge Status</h2>
+            <div class="flex flex-wrap gap-2">
+              <span class="badge badge-success">Aktif</span>
+              <span class="badge badge-warning">Stok Menipis</span>
+              <span class="badge badge-danger">Expired</span>
+              <span class="badge badge-neutral">Draft</span>
+            </div>
+          </section>
+
+          <!-- Form -->
+          <section class="app-card p-5">
+            <h2 class="mb-4 text-sm font-semibold text-slate-700">Form Input</h2>
+            <div class="grid max-w-md gap-4">
+              <div>
+                <label class="input-label">Nama Obat</label>
+                <input type="text" class="input-field" placeholder="Contoh: Paracetamol 500mg" />
+              </div>
+              <div>
+                <label class="input-label">Stok Minimum</label>
+                <input type="number" class="input-field" placeholder="0" />
+                <p class="input-error">Contoh pesan validasi error</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Toast trigger -->
+          <section class="app-card p-5">
+            <h2 class="mb-4 text-sm font-semibold text-slate-700">Toast Notification</h2>
+            <div class="flex flex-wrap gap-2">
+              <button class="btn btn-outline" @click="Toast.success('Data berhasil disimpan')">Trigger Success</button>
+              <button class="btn btn-outline" @click="Toast.error('Gagal menghapus data')">Trigger Error</button>
+              <button class="btn btn-outline" @click="Toast.warning('Stok hampir habis')">Trigger Warning</button>
+            </div>
+          </section>
+
+          <!-- Confirm dialog trigger -->
+          <section class="app-card p-5">
+            <h2 class="mb-4 text-sm font-semibold text-slate-700">Confirm Dialog</h2>
+            <button
+              class="btn btn-danger"
+              @click="Confirm.ask({ title: 'Hapus Obat?', message: 'Data yang dihapus tidak dapat dikembalikan.', onConfirm: () => Toast.success('Obat berhasil dihapus (contoh)') })"
+            >
+              Hapus Obat (contoh)
+            </button>
+          </section>
+
+          <!-- Table + Pagination -->
+          <section>
+            <h2 class="mb-3 text-sm font-semibold text-slate-700">Reusable Table &amp; Pagination</h2>
+            <div data-include="../components/table.html"></div>
+            <div data-include="../components/pagination.html"></div>
+          </section>
+
+          <!-- Loading skeleton -->
+          <section>
+            <h2 class="mb-3 text-sm font-semibold text-slate-700">Loading Skeleton</h2>
+            <div data-include="../components/loading.html"></div>
+          </section>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Global overlays: toast & confirm dialog (include sekali di sini) -->
+  <div data-include="../components/toast.html"></div>
+  <div data-include="../components/modal.html"></div>
+
+</body>
+</html>

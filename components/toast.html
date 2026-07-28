@@ -1,0 +1,28 @@
+<!--
+  toast.html
+  -----------------------------------------------------------------------
+  Container toast, di-include SEKALI per halaman. Terhubung ke
+  Alpine.store('toast') (lihat js/toast.js). Dipanggil dari mana saja:
+    Toast.success("Data berhasil disimpan")
+    Toast.error("Gagal menghapus data")
+-->
+<div x-data class="pointer-events-none fixed right-4 top-4 z-50 flex w-full max-w-xs flex-col gap-2">
+  <template x-for="item in $store.toast.items" :key="item.id">
+    <div
+      x-show="true"
+      x-transition
+      class="toast-item"
+      :class="{
+        'toast-success': item.type === 'success',
+        'toast-danger': item.type === 'danger',
+        'toast-warning': item.type === 'warning',
+        'toast-info': item.type === 'info',
+      }"
+    >
+      <span class="flex-1" x-text="item.message"></span>
+      <button type="button" class="pointer-events-auto text-current/70 hover:text-current" @click="$store.toast.remove(item.id)">
+        &times;
+      </button>
+    </div>
+  </template>
+</div>

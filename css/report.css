@@ -1,0 +1,24 @@
+/**
+ * report.css
+ * -----------------------------------------------------------------------
+ * Aturan @media print supaya "Export PDF / Print" hanya mencetak tabel
+ * laporan yang sedang aktif (#report-print-area), bukan seluruh shell
+ * aplikasi (sidebar/navbar/tab lain disembunyikan otomatis saat print).
+ * -----------------------------------------------------------------------
+ */
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #report-print-area,
+  #report-print-area * {
+    visibility: visible;
+  }
+  #report-print-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+}
