@@ -6,12 +6,13 @@
   Bergantung pada Alpine.store('layout') untuk state buka/tutup di mobile
   (didefinisikan inline di sini supaya sidebar tetap "berdiri sendiri").
 
-  Menu di bawah ini merepresentasikan semua modul sesuai brief. Link href
-  masih placeholder ("#") karena routing antar /pages/*.html baru dibuat
-  mulai Tahap 3. Item yang aktif ditandai lewat class .sidebar-link-active.
+  Menu di bawah ini merepresentasikan semua modul sesuai brief. Item yang
+  aktif ditandai otomatis lewat perbandingan `currentPage` (nama file
+  halaman saat ini) dengan `href` masing-masing link.
 -->
 <div
   x-data="{
+    currentPage: location.pathname.split('/').pop(),
     openMasterData: ['medicine.html','master-lookup.html','supplier.html','customer.html','users.html'].includes(location.pathname.split('/').pop()),
     openPenjualan: ['pos.html','sales.html'].includes(location.pathname.split('/').pop()),
   }"
@@ -27,13 +28,13 @@
 
   <!-- Menu -->
   <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4 text-sm">
-    <a href="dashboard.html" class="sidebar-link">
+    <a href="dashboard.html" class="sidebar-link" :class="currentPage === 'dashboard.html' && 'sidebar-link-active'">
       <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9.75 12 3l9 6.75V21a.75.75 0 0 1-.75.75H14.25v-6.75h-4.5v6.75H3.75A.75.75 0 0 1 3 21V9.75Z"/></svg>
       Dashboard
     </a>
 
     <!-- Master Data (submenu) -->
-    <button type="button" @click="openMasterData = !openMasterData" class="sidebar-link w-full justify-between">
+    <button type="button" @click="openMasterData = !openMasterData" class="sidebar-link w-full justify-between" :class="openMasterData && 'sidebar-link-active'">
       <span class="flex items-center gap-3">
         <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375"/></svg>
         Master Data
@@ -41,20 +42,20 @@
       <svg class="h-4 w-4 shrink-0 transition-transform" :class="openMasterData && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
     </button>
     <div x-show="openMasterData" x-transition class="ml-8 space-y-1 border-l border-slate-700 pl-3">
-      <a href="medicine.html" class="sidebar-sublink">Obat</a>
-      <a href="master-lookup.html" class="sidebar-sublink">Kategori / Satuan / Merk</a>
-      <a href="supplier.html" class="sidebar-sublink">Supplier</a>
-      <a href="customer.html" class="sidebar-sublink">Customer</a>
-      <a href="users.html" class="sidebar-sublink">User</a>
+      <a href="medicine.html" class="sidebar-sublink" :class="currentPage === 'medicine.html' && 'sidebar-sublink-active'">Obat</a>
+      <a href="master-lookup.html" class="sidebar-sublink" :class="currentPage === 'master-lookup.html' && 'sidebar-sublink-active'">Kategori / Satuan / Merk</a>
+      <a href="supplier.html" class="sidebar-sublink" :class="currentPage === 'supplier.html' && 'sidebar-sublink-active'">Supplier</a>
+      <a href="customer.html" class="sidebar-sublink" :class="currentPage === 'customer.html' && 'sidebar-sublink-active'">Customer</a>
+      <a href="users.html" class="sidebar-sublink" :class="currentPage === 'users.html' && 'sidebar-sublink-active'">User</a>
     </div>
 
-    <a href="purchase.html" class="sidebar-link">
+    <a href="purchase.html" class="sidebar-link" :class="currentPage === 'purchase.html' && 'sidebar-link-active'">
       <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM19.5 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.723 2.436-7.234a1.125 1.125 0 0 0-1.1-1.362H5.25M7.5 14.25 5.106 5.272M6.75 14.25 4.106 5.272"/></svg>
       Pembelian
     </a>
 
     <!-- Penjualan (submenu) -->
-    <button type="button" @click="openPenjualan = !openPenjualan" class="sidebar-link w-full justify-between">
+    <button type="button" @click="openPenjualan = !openPenjualan" class="sidebar-link w-full justify-between" :class="openPenjualan && 'sidebar-link-active'">
       <span class="flex items-center gap-3">
         <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.723 2.436-7.234a1.125 1.125 0 0 0-1.1-1.362H5.25M7.5 14.25 5.106 5.272M6.75 14.25 4.106 5.272"/></svg>
         Penjualan
@@ -62,21 +63,21 @@
       <svg class="h-4 w-4 shrink-0 transition-transform" :class="openPenjualan && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
     </button>
     <div x-show="openPenjualan" x-transition class="ml-8 space-y-1 border-l border-slate-700 pl-3">
-      <a href="pos.html" class="sidebar-sublink">POS Kasir</a>
-      <a href="sales.html" class="sidebar-sublink">Riwayat &amp; Retur</a>
+      <a href="pos.html" class="sidebar-sublink" :class="currentPage === 'pos.html' && 'sidebar-sublink-active'">POS Kasir</a>
+      <a href="sales.html" class="sidebar-sublink" :class="currentPage === 'sales.html' && 'sidebar-sublink-active'">Riwayat &amp; Retur</a>
     </div>
 
-    <a href="stock.html" class="sidebar-link">
+    <a href="stock.html" class="sidebar-link" :class="currentPage === 'stock.html' && 'sidebar-link-active'">
       <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5v9.75A2.25 2.25 0 0 1 18 19.5H6a2.25 2.25 0 0 1-2.25-2.25V7.5m16.5 0A2.25 2.25 0 0 0 18 5.25H6A2.25 2.25 0 0 0 3.75 7.5m16.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.82 9.66A2.25 2.25 0 0 1 2.75 7.743V7.5"/></svg>
       Persediaan
     </a>
 
-    <a href="report.html" class="sidebar-link">
+    <a href="report.html" class="sidebar-link" :class="currentPage === 'report.html' && 'sidebar-link-active'">
       <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
       Laporan
     </a>
 
-    <a href="setting.html" class="sidebar-link">
+    <a href="setting.html" class="sidebar-link" :class="currentPage === 'setting.html' && 'sidebar-link-active'">
       <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 0 1 0 .255c-.007.379.138.752.43.992l1.005.828c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.759 6.759 0 0 1 0-.255c.007-.379-.138-.752-.43-.992l-1.004-.828a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
       Setting
     </a>
