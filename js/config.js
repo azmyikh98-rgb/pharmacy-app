@@ -20,7 +20,7 @@ const APP_CONFIG = Object.freeze({
   // URL Web App Google Apps Script.
   // Diisi setelah deploy Apps Script di Tahap 3 (Authentication) / Tahap 5 (Master Data).
   // Contoh: "https://script.google.com/macros/s/XXXXXXXX/exec"
-  API_BASE_URL: "https://script.google.com/macros/s/AKfycbwS0YSvKaIoiFcrD5c3PLXTEbsVrs8Laripf48avXE2nKGBbOyoNJvRL3gRt_N9i-uu/exec",
+  API_BASE_URL: "",
 
   // Timeout request ke Apps Script (ms). Apps Script relatif lambat,
   // jadi diberi toleransi lebih tinggi dari API biasa.
