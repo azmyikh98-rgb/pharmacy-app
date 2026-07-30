@@ -29,6 +29,12 @@ function settingPage() {
     restoreSummary: null,
 
     async init() {
+      // Buka tab sesuai link yang diklik dari sidebar (mis. setting.html?tab=backup)
+      const requestedTab = Utils.getQueryParam("tab");
+      if (requestedTab && this.tabs.some((t) => t.key === requestedTab)) {
+        this.activeTab = requestedTab;
+      }
+
       this.loading = true;
       try {
         this.form = await Api.get(this.moduleName, "get");
