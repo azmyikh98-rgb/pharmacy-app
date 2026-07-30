@@ -11,6 +11,7 @@ function loginForm() {
     username: "",
     password: "",
     remember: false,
+    showPassword: false,
     loading: false,
     errorMessage: "",
     appName: window.APP_CONFIG?.APP_NAME || "",
