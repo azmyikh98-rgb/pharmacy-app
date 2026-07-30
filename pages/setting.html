@@ -39,21 +39,8 @@
       <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8" x-data="settingPage()" x-init="init()">
         <div class="mx-auto max-w-3xl space-y-6">
           <div>
-            <h1 class="text-xl font-semibold text-slate-900">Setting</h1>
+            <h1 class="text-xl font-semibold text-slate-900" x-text="tabs.find(t => t.key === activeTab)?.label || 'Setting'"></h1>
             <p class="mt-1 text-sm text-slate-500">Profil apotek, pajak default, backup dan restore data.</p>
-          </div>
-
-          <!-- Tabs -->
-          <div class="flex gap-1 border-b border-slate-200">
-            <template x-for="tab in tabs" :key="tab.key">
-              <button
-                type="button"
-                class="border-b-2 px-4 py-2 text-sm font-medium"
-                :class="activeTab === tab.key ? 'border-primary-600 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'"
-                @click="setTab(tab.key)"
-                x-text="tab.label"
-              ></button>
-            </template>
           </div>
 
           <!-- Tab: Profil Apotek -->
