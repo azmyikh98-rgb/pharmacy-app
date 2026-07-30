@@ -133,7 +133,7 @@
                   </div>
                   <div>
                     <label class="input-label">Supplier <span class="text-danger-600">*</span></label>
-                    <input type="text" class="input-field" x-model="form.supplier" placeholder="Nama supplier" required />
+                    <input type="text" class="input-field" x-model="form.supplier" placeholder="Contoh: PT Kimia Farma" required />
                   </div>
                 </div>
 
@@ -160,8 +160,8 @@
                                 <template x-for="m in medicines" :key="m.id"><option :value="m.id" x-text="m.name"></option></template>
                               </select>
                             </td>
-                            <td><input type="number" min="1" class="input-field" x-model="item.qty" required /></td>
-                            <td><input type="number" min="0" class="input-field" x-model="item.buy_price" required /></td>
+                            <td><input type="number" min="1" class="input-field" x-model="item.qty" placeholder="1" required /></td>
+                            <td><input type="number" min="0" class="input-field" x-model="item.buy_price" placeholder="0" required /></td>
                             <td class="text-right text-slate-700" x-text="formatRupiah(itemSubtotal(item))"></td>
                             <td>
                               <button type="button" class="btn btn-ghost text-danger-600" @click="removeItemRow(index)">&times;</button>
@@ -185,7 +185,7 @@
                 </div>
                 <div>
                   <label class="input-label">Catatan</label>
-                  <textarea class="input-field" rows="2" x-model="form.notes"></textarea>
+                  <textarea class="input-field" rows="2" x-model="form.notes" placeholder="Contoh: Kirim ke gudang utama sebelum jam 15.00"></textarea>
                 </div>
               </fieldset>
 
@@ -215,11 +215,11 @@
               </div>
               <div>
                 <label class="input-label">Qty Retur</label>
-                <input type="number" min="1" class="input-field" x-model="returForm.qty" required />
+                <input type="number" min="1" class="input-field" x-model="returForm.qty" placeholder="1" required />
               </div>
               <div>
                 <label class="input-label">Alasan Retur</label>
-                <textarea class="input-field" rows="2" x-model="returForm.reason" placeholder="Mis. barang rusak / tidak sesuai pesanan"></textarea>
+                <textarea class="input-field" rows="2" x-model="returForm.reason" placeholder="Contoh: Barang rusak saat pengiriman"></textarea>
               </div>
               <div class="mt-5 flex justify-end gap-2">
                 <button type="button" class="btn btn-ghost" @click="closeReturModal()">Batal</button>

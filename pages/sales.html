@@ -151,11 +151,11 @@
               </div>
               <div>
                 <label class="input-label">Qty Retur</label>
-                <input type="number" min="1" class="input-field" x-model="returForm.qty" required />
+                <input type="number" min="1" class="input-field" x-model="returForm.qty" placeholder="1" required />
               </div>
               <div>
                 <label class="input-label">Alasan Retur</label>
-                <textarea class="input-field" rows="2" x-model="returForm.reason" placeholder="Mis. obat tidak sesuai / customer batal"></textarea>
+                <textarea class="input-field" rows="2" x-model="returForm.reason" placeholder="Contoh: Obat salah kirim / customer batal"></textarea>
               </div>
               <div class="mt-5 flex justify-end gap-2">
                 <button type="button" class="btn btn-ghost" @click="closeReturModal()">Batal</button>

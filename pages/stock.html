@@ -69,15 +69,15 @@
               </div>
               <div>
                 <label class="input-label">Qty Masuk</label>
-                <input type="number" min="1" class="input-field" x-model="formIn.qty" required />
+                <input type="number" min="1" class="input-field" x-model="formIn.qty" placeholder="Contoh: 50" required />
               </div>
               <div>
                 <label class="input-label">Referensi</label>
-                <input type="text" class="input-field" x-model="formIn.reference" placeholder="Mis. no. dokumen internal" />
+                <input type="text" class="input-field" x-model="formIn.reference" placeholder="Contoh: Faktur-2024-001" />
               </div>
               <div>
                 <label class="input-label">Catatan</label>
-                <textarea class="input-field" rows="2" x-model="formIn.notes"></textarea>
+                <textarea class="input-field" rows="2" x-model="formIn.notes" placeholder="Contoh: Tambahan stok dari gudang pusat"></textarea>
               </div>
               <button type="submit" class="btn btn-primary w-full" :disabled="savingIn">
                 <span x-show="!savingIn">Simpan Stock Masuk</span>
@@ -100,15 +100,15 @@
               </div>
               <div>
                 <label class="input-label">Qty Keluar</label>
-                <input type="number" min="1" class="input-field" x-model="formOut.qty" required />
+                <input type="number" min="1" class="input-field" x-model="formOut.qty" placeholder="Contoh: 10" required />
               </div>
               <div>
                 <label class="input-label">Referensi</label>
-                <input type="text" class="input-field" x-model="formOut.reference" placeholder="Mis. alasan pemakaian internal" />
+                <input type="text" class="input-field" x-model="formOut.reference" placeholder="Contoh: Pemakaian internal klinik" />
               </div>
               <div>
                 <label class="input-label">Catatan</label>
-                <textarea class="input-field" rows="2" x-model="formOut.notes"></textarea>
+                <textarea class="input-field" rows="2" x-model="formOut.notes" placeholder="Contoh: Dipakai untuk stok display"></textarea>
               </div>
               <button type="submit" class="btn btn-primary w-full" :disabled="savingOut">
                 <span x-show="!savingOut">Simpan Stock Keluar</span>
@@ -132,11 +132,11 @@
               </div>
               <div>
                 <label class="input-label">Stok Fisik Hasil Hitung</label>
-                <input type="number" min="0" class="input-field" x-model="formOpname.physical_stock" required />
+                <input type="number" min="0" class="input-field" x-model="formOpname.physical_stock" placeholder="Contoh: 95" required />
               </div>
               <div>
                 <label class="input-label">Catatan</label>
-                <textarea class="input-field" rows="2" x-model="formOpname.notes"></textarea>
+                <textarea class="input-field" rows="2" x-model="formOpname.notes" placeholder="Contoh: Hasil stock opname bulanan"></textarea>
               </div>
               <button type="submit" class="btn btn-primary w-full" :disabled="savingOpname">
                 <span x-show="!savingOpname">Simpan Stock Opname</span>
@@ -166,11 +166,11 @@
               </div>
               <div>
                 <label class="input-label">Lokasi Rak Tujuan</label>
-                <input type="text" class="input-field" x-model="formTransfer.to_location" placeholder="Mis. Rak A-3" required />
+                <input type="text" class="input-field" x-model="formTransfer.to_location" placeholder="Contoh: Rak A-3" required />
               </div>
               <div>
                 <label class="input-label">Catatan</label>
-                <textarea class="input-field" rows="2" x-model="formTransfer.notes"></textarea>
+                <textarea class="input-field" rows="2" x-model="formTransfer.notes" placeholder="Contoh: Reorganisasi gudang"></textarea>
               </div>
               <button type="submit" class="btn btn-primary w-full" :disabled="savingTransfer">
                 <span x-show="!savingTransfer">Simpan Transfer</span>

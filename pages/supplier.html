@@ -56,30 +56,30 @@
             <form @submit.prevent="submitForm()" class="mt-4 space-y-3">
               <div>
                 <label class="input-label">Nama Supplier <span class="text-danger-600">*</span></label>
-                <input type="text" class="input-field" x-model="form.name" required />
+                <input type="text" class="input-field" x-model="form.name" placeholder="Contoh: PT Kimia Farma" required />
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="input-label">PIC</label>
-                  <input type="text" class="input-field" x-model="form.pic" />
+                  <input type="text" class="input-field" x-model="form.pic" placeholder="Contoh: Budi Santoso" />
                 </div>
                 <div>
                   <label class="input-label">Telepon</label>
-                  <input type="text" class="input-field" x-model="form.phone" />
+                  <input type="text" class="input-field" x-model="form.phone" placeholder="Contoh: 081234567890" />
                 </div>
               </div>
               <div>
                 <label class="input-label">Alamat</label>
-                <input type="text" class="input-field" x-model="form.address" />
+                <input type="text" class="input-field" x-model="form.address" placeholder="Contoh: Jl. Merdeka No. 10, Jakarta" />
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="input-label">Email</label>
-                  <input type="email" class="input-field" x-model="form.email" />
+                  <input type="email" class="input-field" x-model="form.email" placeholder="Contoh: supplier@email.com" />
                 </div>
                 <div>
                   <label class="input-label">NPWP</label>
-                  <input type="text" class="input-field" x-model="form.npwp" />
+                  <input type="text" class="input-field" x-model="form.npwp" placeholder="Contoh: 01.234.567.8-901.000" />
                 </div>
               </div>
               <div>

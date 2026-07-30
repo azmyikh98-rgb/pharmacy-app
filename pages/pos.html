@@ -110,15 +110,15 @@
             <div class="mt-3 grid grid-cols-3 gap-2">
               <div>
                 <label class="input-label">Diskon (Rp)</label>
-                <input type="number" min="0" class="input-field" x-model="discount" />
+                <input type="number" min="0" class="input-field" x-model="discount" placeholder="0" />
               </div>
               <div>
                 <label class="input-label">Voucher (Rp)</label>
-                <input type="number" min="0" class="input-field" x-model="voucher" />
+                <input type="number" min="0" class="input-field" x-model="voucher" placeholder="0" />
               </div>
               <div>
                 <label class="input-label">Pajak (%)</label>
-                <input type="number" min="0" class="input-field" x-model="taxPercent" />
+                <input type="number" min="0" class="input-field" x-model="taxPercent" placeholder="0" />
               </div>
             </div>
 
@@ -144,7 +144,7 @@
               </div>
               <div>
                 <label class="input-label">Jumlah Bayar</label>
-                <input type="number" min="0" class="input-field" x-model="paidAmount" />
+                <input type="number" min="0" class="input-field" x-model="paidAmount" placeholder="Contoh: 50000" />
               </div>
             </div>
             <p class="mt-1 text-right text-xs text-slate-500">Kembalian: <span class="font-medium" x-text="formatRupiah(changeAmount)"></span></p>

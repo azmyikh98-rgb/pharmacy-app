@@ -59,16 +59,16 @@
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="input-label">Kode Obat <span class="text-danger-600">*</span></label>
-                  <input type="text" class="input-field" x-model="form.code" required />
+                  <input type="text" class="input-field" x-model="form.code" placeholder="Contoh: OBT-001" required />
                 </div>
                 <div>
                   <label class="input-label">Barcode</label>
-                  <input type="text" class="input-field" x-model="form.barcode" />
+                  <input type="text" class="input-field" x-model="form.barcode" placeholder="Contoh: 8991234567890" />
                 </div>
               </div>
               <div>
                 <label class="input-label">Nama Obat <span class="text-danger-600">*</span></label>
-                <input type="text" class="input-field" x-model="form.name" required />
+                <input type="text" class="input-field" x-model="form.name" placeholder="Contoh: Paracetamol 500mg" required />
               </div>
 
               <!-- Kategori / Golongan / Merk / Satuan -->
@@ -112,11 +112,11 @@
               <div class="grid grid-cols-3 gap-3">
                 <div>
                   <label class="input-label">Harga Beli</label>
-                  <input type="number" min="0" class="input-field" x-model="form.buy_price" />
+                  <input type="number" min="0" class="input-field" x-model="form.buy_price" placeholder="Contoh: 1500" />
                 </div>
                 <div>
                   <label class="input-label">Harga Jual</label>
-                  <input type="number" min="0" class="input-field" x-model="form.sell_price" />
+                  <input type="number" min="0" class="input-field" x-model="form.sell_price" placeholder="Contoh: 2000" />
                 </div>
                 <div>
                   <label class="input-label">Margin</label>
@@ -128,11 +128,11 @@
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="input-label">Stok</label>
-                  <input type="number" min="0" class="input-field" x-model="form.stock" />
+                  <input type="number" min="0" class="input-field" x-model="form.stock" placeholder="Contoh: 100" />
                 </div>
                 <div>
                   <label class="input-label">Minimum Stock</label>
-                  <input type="number" min="0" class="input-field" x-model="form.min_stock" />
+                  <input type="number" min="0" class="input-field" x-model="form.min_stock" placeholder="Contoh: 10" />
                 </div>
               </div>
 
@@ -140,7 +140,7 @@
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="input-label">Batch</label>
-                  <input type="text" class="input-field" x-model="form.batch" />
+                  <input type="text" class="input-field" x-model="form.batch" placeholder="Contoh: B2024001" />
                 </div>
                 <div>
                   <label class="input-label">Expired Date</label>
@@ -152,7 +152,7 @@
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="input-label">Lokasi Rak</label>
-                  <input type="text" class="input-field" x-model="form.rack_location" />
+                  <input type="text" class="input-field" x-model="form.rack_location" placeholder="Contoh: Rak A-1" />
                 </div>
                 <div>
                   <label class="input-label">Supplier</label>
@@ -169,7 +169,7 @@
               </div>
               <div>
                 <label class="input-label">Keterangan</label>
-                <textarea class="input-field" rows="2" x-model="form.notes"></textarea>
+                <textarea class="input-field" rows="2" x-model="form.notes" placeholder="Contoh: Simpan di tempat sejuk dan kering, hindari sinar matahari langsung"></textarea>
               </div>
               <div>
                 <label class="input-label">Status</label>
