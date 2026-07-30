@@ -8,9 +8,15 @@
  * Contoh pemakaian di halaman:
  *   <div data-include="components/navbar.html"></div>
  *
- * Setelah fragment disisipkan, Alpine.initTree() dipanggil supaya
- * x-data/x-show/x-for di dalam fragment ikut aktif (karena fragment
- * disisipkan setelah Alpine pertama kali melakukan scan halaman).
+ * PENTING — urutan start Alpine:
+ * Alpine TIDAK dibiarkan auto-start begitu script-nya termuat. Lewat
+ * `window.deferLoadingAlpine` (fitur bawaan Alpine), start Alpine ditunda
+ * sampai SEMUA fragment [data-include] selesai di-fetch dan disisipkan ke
+ * DOM. Ini untuk menghindari bug: Alpine sempat memindai halaman sebelum
+ * fragment termuat, lalu memindai ULANG setelah fragment masuk — yang
+ * menyebabkan <template x-for> di dalam fragment (mis. tabel Master Data)
+ * dirender DUA KALI (kolom/baris dobel). Dengan pola ini, Alpine hanya
+ * memindai dokumen SATU KALI, setelah semua konten final ada di DOM.
  * -----------------------------------------------------------------------
  */
 
@@ -23,9 +29,6 @@ const Components = {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       el.innerHTML = await res.text();
       el.removeAttribute("data-include");
-      if (window.Alpine && typeof window.Alpine.initTree === "function") {
-        window.Alpine.initTree(el);
-      }
       el.dispatchEvent(new CustomEvent("component:loaded", { bubbles: true, detail: { src } }));
     } catch (err) {
       console.error(`[Components] Gagal memuat komponen: ${src}`, err);
@@ -40,4 +43,22 @@ const Components = {
 };
 
 window.Components = Components;
-document.addEventListener("DOMContentLoaded", () => Components.loadAll());
+
+// Beri tahu Alpine untuk menunda auto-start-nya (harus didaftarkan SEBELUM
+// script Alpine dieksekusi — aman ditaruh di sini karena components.js
+// non-defer, jadi selalu jalan lebih dulu daripada <script defer> Alpine).
+window.deferLoadingAlpine = function (startAlpine) {
+  window._startAlpineWhenReady = startAlpine;
+};
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await Components.loadAll();
+  if (typeof window._startAlpineWhenReady === "function") {
+    window._startAlpineWhenReady();
+  } else {
+    console.warn(
+      "[Components] window.deferLoadingAlpine tidak terpasang sebelum Alpine dimuat — " +
+        "Alpine mungkin sudah start duluan dan fragment bisa ter-render dobel."
+    );
+  }
+});
