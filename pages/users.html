@@ -26,8 +26,8 @@
   <script src="../js/users.js"></script>
 </head>
 <body class="min-h-screen bg-surface font-sans text-slate-800 antialiased">
-  <!-- Hanya admin & owner yang boleh mengelola user -->
-  <script>Auth.requireAuth(["admin", "owner"]);</script>
+  <!-- Hanya admin yang boleh mengelola user -->
+  <script>Auth.requireAuth(["admin"]);</script>
 
   <div x-data class="flex h-screen overflow-hidden">
     <aside class="hidden lg:block" data-include="../components/sidebar.html"></aside>

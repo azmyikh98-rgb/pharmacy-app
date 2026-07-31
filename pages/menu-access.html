@@ -25,8 +25,8 @@
   <script src="../js/menu-access.js"></script>
 </head>
 <body class="min-h-screen bg-surface font-sans text-slate-800 antialiased">
-  <!-- Hanya admin & owner yang boleh mengatur akses menu -->
-  <script>Auth.requireAuth(["admin", "owner"]);</script>
+  <!-- Hanya admin yang boleh mengatur akses menu -->
+  <script>Auth.requireAuth(["admin"]);</script>
 
   <div x-data class="flex h-screen overflow-hidden">
     <aside class="hidden lg:block" data-include="../components/sidebar.html"></aside>
@@ -41,6 +41,7 @@
           <div>
             <h1 class="text-xl font-semibold text-slate-900">Akses Menu</h1>
             <p class="mt-1 text-sm text-slate-500">Atur menu mana yang boleh diakses per role, atau khusus per user.</p>
+            <p class="mt-1 text-xs text-slate-400">Menu Setting tidak termasuk di sini — Setting selalu khusus role Admin.</p>
           </div>
 
           <div class="app-card p-5">
