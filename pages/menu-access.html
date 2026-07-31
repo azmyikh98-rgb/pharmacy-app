@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Akses Menu — Modern Pharmacy Management System</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../js/tailwind.config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+
+  <script src="../js/config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/layout.js"></script>
+  <script src="../js/toast.js"></script>
+  <script src="../js/modal.js"></script>
+  <script src="../js/ui-components.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/menu-access.js"></script>
+</head>
+<body class="min-h-screen bg-surface font-sans text-slate-800 antialiased">
+  <!-- Hanya admin & owner yang boleh mengatur akses menu -->
+  <script>Auth.requireAuth(["admin", "owner"]);</script>
+
+  <div x-data class="flex h-screen overflow-hidden">
+    <aside class="hidden lg:block" data-include="../components/sidebar.html"></aside>
+    <div x-show="$store.layout.sidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-slate-900/50 lg:hidden" style="display:none;" @click="$store.layout.closeSidebar()"></div>
+    <div x-show="$store.layout.sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="fixed inset-y-0 left-0 z-50 lg:hidden" style="display:none;" data-include="../components/sidebar.html"></div>
+
+    <div class="flex flex-1 flex-col overflow-hidden">
+      <div data-include="../components/navbar.html"></div>
+
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8" x-data="menuAccessPage()" x-init="init()">
+        <div class="mx-auto max-w-2xl space-y-6">
+          <div>
+            <h1 class="text-xl font-semibold text-slate-900">Akses Menu</h1>
+            <p class="mt-1 text-sm text-slate-500">Atur menu mana yang boleh diakses per role, atau khusus per user.</p>
+          </div>
+
+          <div class="app-card p-5">
+            <label class="input-label">Terapkan Pengaturan Untuk</label>
+            <select class="input-field" x-model="selectedTarget" @change="onTargetChange()">
+              <optgroup label="Pengaturan Umum (per Role)">
+                <template x-for="role in roles" :key="role">
+                  <option :value="'role:' + role" x-text="'Semua ' + roleLabel(role) + ' (Umum)'"></option>
+                </template>
+              </optgroup>
+              <optgroup label="Khusus per User" x-show="users.length > 0">
+                <template x-for="u in users" :key="u.id">
+                  <option :value="'user:' + u.id" x-text="u.name + ' (' + u.username + ')'"></option>
+                </template>
+              </optgroup>
+            </select>
+
+            <p class="mt-2 text-xs text-slate-500" x-show="targetType === 'role'">
+              Atur menu yang boleh diakses oleh semua role <span class="font-medium" x-text="roleLabel(targetId)"></span> (berlaku sebagai pengaturan umum).
+              Role Admin selalu memiliki akses penuh ke semua menu.
+            </p>
+            <p class="mt-2 text-xs text-slate-500" x-show="targetType === 'user'">
+              Atur akses menu khusus untuk <span class="font-medium" x-text="selectedUser?.name"></span>.
+              Jika "Akses Khusus" dimatikan, user ini mengikuti pengaturan umum role
+              <span class="font-medium" x-text="roleLabel(selectedUser?.role)"></span> di atas.
+            </p>
+          </div>
+
+          <!-- Toggle Akses Khusus (hanya untuk target user) -->
+          <div class="app-card flex items-center justify-between p-4" x-show="targetType === 'user'">
+            <span class="text-sm font-medium text-slate-700">Gunakan Akses Khusus untuk User Ini</span>
+            <button
+              type="button"
+              class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+              :class="useCustom ? 'bg-primary-600' : 'bg-slate-200'"
+              @click="useCustom = !useCustom"
+            >
+              <span class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform" :class="useCustom ? 'translate-x-5' : 'translate-x-0.5'"></span>
+            </button>
+          </div>
+
+          <!-- Daftar toggle menu -->
+          <div class="app-card divide-y divide-slate-100 p-2" :class="togglesLocked && 'opacity-60'">
+            <template x-if="loading">
+              <div class="space-y-3 p-3">
+                <template x-for="i in 5" :key="i"><div class="skeleton-line"></div></template>
+              </div>
+            </template>
+
+            <template x-for="key in menuKeys" :key="key">
+              <div class="flex items-center justify-between px-3 py-3">
+                <span class="text-sm text-slate-700" x-text="menuMeta[key].label"></span>
+                <button
+                  type="button"
+                  class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+                  :class="menus[key] ? 'bg-primary-600' : 'bg-slate-200'"
+                  :disabled="togglesLocked"
+                  @click="toggleMenu(key)"
+                >
+                  <span class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform" :class="menus[key] ? 'translate-x-5' : 'translate-x-0.5'"></span>
+                </button>
+              </div>
+            </template>
+          </div>
+
+          <button type="button" class="btn btn-primary" :disabled="saving" @click="save()">
+            <span x-show="!saving">Simpan Akses Menu</span>
+            <span x-show="saving">Menyimpan...</span>
+          </button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div data-include="../components/toast.html"></div>
+  <div data-include="../components/modal.html"></div>
+</body>
+</html>
