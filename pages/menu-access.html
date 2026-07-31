@@ -111,12 +111,14 @@
                 </button>
               </div>
             </template>
-          </div>
 
-          <button type="button" class="btn btn-primary" :disabled="saving" @click="save()">
-            <span x-show="!saving">Simpan Akses Menu</span>
-            <span x-show="saving">Menyimpan...</span>
-          </button>
+            <div class="p-3">
+              <button type="button" class="btn btn-primary w-full" :disabled="saving" @click="save()">
+                <span x-show="!saving">Simpan Akses Menu</span>
+                <span x-show="saving">Menyimpan...</span>
+              </button>
+            </div>
+          </div>
         </div>
       </main>
     </div>
