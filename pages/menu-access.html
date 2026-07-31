@@ -74,11 +74,14 @@
             <span class="text-sm font-medium text-slate-700">Gunakan Akses Khusus untuk User Ini</span>
             <button
               type="button"
-              class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+              class="relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200"
               :class="useCustom ? 'bg-primary-600' : 'bg-slate-200'"
               @click="useCustom = !useCustom"
             >
-              <span class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform" :class="useCustom ? 'translate-x-5' : 'translate-x-0.5'"></span>
+              <span
+                class="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200"
+                :style="useCustom ? 'transform: translateX(20px)' : 'transform: translateX(0)'"
+              ></span>
             </button>
           </div>
 
@@ -95,12 +98,15 @@
                 <span class="text-sm text-slate-700" x-text="menuMeta[key].label"></span>
                 <button
                   type="button"
-                  class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+                  class="relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200"
                   :class="menus[key] ? 'bg-primary-600' : 'bg-slate-200'"
                   :disabled="togglesLocked"
                   @click="toggleMenu(key)"
                 >
-                  <span class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform" :class="menus[key] ? 'translate-x-5' : 'translate-x-0.5'"></span>
+                  <span
+                    class="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200"
+                    :style="menus[key] ? 'transform: translateX(20px)' : 'transform: translateX(0)'"
+                  ></span>
                 </button>
               </div>
             </template>
