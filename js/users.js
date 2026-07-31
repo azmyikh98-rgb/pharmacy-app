@@ -16,7 +16,7 @@ function usersPage() {
     defaultForm: () => ({ status: "active", role: "kasir" }),
   });
 
-  page.roles = ["admin", "apoteker", "kasir", "gudang", "owner"];
+  page.roles = ["admin", "apoteker", "kasir", "gudang"];
 
   // Override openEdit bawaan supaya field password selalu dikosongkan saat edit.
   // PENTING: simpan referensi fungsi ASLI tanpa .bind() ke `page` (objek mentah

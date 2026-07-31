@@ -8,7 +8,7 @@
 
 function menuAccessPage() {
   return {
-    menuKeys: ["dashboard", "master_data", "purchase", "sales", "stock", "report", "setting"],
+    menuKeys: ["dashboard", "master_data", "purchase", "sales", "stock", "report"],
     menuMeta: {
       dashboard: { label: "Dashboard" },
       master_data: { label: "Master Data" },
@@ -16,9 +16,8 @@ function menuAccessPage() {
       sales: { label: "Penjualan" },
       stock: { label: "Persediaan" },
       report: { label: "Laporan" },
-      setting: { label: "Setting" },
     },
-    roleLabels: { kasir: "Kasir", apoteker: "Apoteker", gudang: "Gudang", owner: "Owner" },
+    roleLabels: { kasir: "Kasir", apoteker: "Apoteker", gudang: "Gudang" },
 
     roles: [],
     users: [],

@@ -57,7 +57,7 @@ const Auth = {
   /**
    * Route guard. Panggil di awal <body> setiap halaman di /pages/ (selain login.html):
    *   <script>Auth.requireAuth();</script>
-   *   <script>Auth.requireAuth(['admin', 'owner']);</script>  // + role permission
+   *   <script>Auth.requireAuth(['admin']);</script>  // + role permission
    *
    * Return true jika lolos, false jika di-redirect (supaya pemanggil bisa
    * langsung `return` dan tidak melanjutkan render halaman).
