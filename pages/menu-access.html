@@ -44,76 +44,78 @@
             <p class="mt-1 text-xs text-slate-400">Menu Setting tidak termasuk di sini — Setting selalu khusus role Admin.</p>
           </div>
 
-          <div class="app-card p-5">
-            <label class="input-label">Terapkan Pengaturan Untuk</label>
-            <select class="input-field" x-model="selectedTarget" @change="onTargetChange()">
-              <optgroup label="Pengaturan Umum (per Role)">
-                <template x-for="role in roles" :key="role">
-                  <option :value="'role:' + role" x-text="'Semua ' + roleLabel(role) + ' (Umum)'"></option>
-                </template>
-              </optgroup>
-              <optgroup label="Khusus per User" x-show="users.length > 0">
-                <template x-for="u in users" :key="u.id">
-                  <option :value="'user:' + u.id" x-text="u.name + ' (' + u.username + ')'"></option>
-                </template>
-              </optgroup>
-            </select>
+          <div class="app-card overflow-hidden">
+            <div class="p-5">
+              <label class="input-label">Terapkan Pengaturan Untuk</label>
+              <select class="input-field" x-model="selectedTarget" @change="onTargetChange()">
+                <optgroup label="Pengaturan Umum (per Role)">
+                  <template x-for="role in roles" :key="role">
+                    <option :value="'role:' + role" x-text="'Semua ' + roleLabel(role) + ' (Umum)'"></option>
+                  </template>
+                </optgroup>
+                <optgroup label="Khusus per User" x-show="users.length > 0">
+                  <template x-for="u in users" :key="u.id">
+                    <option :value="'user:' + u.id" x-text="u.name + ' (' + u.username + ')'"></option>
+                  </template>
+                </optgroup>
+              </select>
 
-            <p class="mt-2 text-xs text-slate-500" x-show="targetType === 'role'">
-              Atur menu yang boleh diakses oleh semua role <span class="font-medium" x-text="roleLabel(targetId)"></span> (berlaku sebagai pengaturan umum).
-              Role Admin selalu memiliki akses penuh ke semua menu.
-            </p>
-            <p class="mt-2 text-xs text-slate-500" x-show="targetType === 'user'">
-              Atur akses menu khusus untuk <span class="font-medium" x-text="selectedUser?.name"></span>.
-              Jika "Akses Khusus" dimatikan, user ini mengikuti pengaturan umum role
-              <span class="font-medium" x-text="roleLabel(selectedUser?.role)"></span> di atas.
-            </p>
-          </div>
+              <p class="mt-2 text-xs text-slate-500" x-show="targetType === 'role'">
+                Atur menu yang boleh diakses oleh semua role <span class="font-medium" x-text="roleLabel(targetId)"></span> (berlaku sebagai pengaturan umum).
+                Role Admin selalu memiliki akses penuh ke semua menu.
+              </p>
+              <p class="mt-2 text-xs text-slate-500" x-show="targetType === 'user'">
+                Atur akses menu khusus untuk <span class="font-medium" x-text="selectedUser?.name"></span>.
+                Jika "Akses Khusus" dimatikan, user ini mengikuti pengaturan umum role
+                <span class="font-medium" x-text="roleLabel(selectedUser?.role)"></span> di atas.
+              </p>
+            </div>
 
-          <!-- Toggle Akses Khusus (hanya untuk target user) -->
-          <div class="app-card flex items-center justify-between p-4" x-show="targetType === 'user'">
-            <span class="text-sm font-medium text-slate-700">Gunakan Akses Khusus untuk User Ini</span>
-            <button
-              type="button"
-              class="relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200"
-              :class="useCustom ? 'bg-primary-600' : 'bg-slate-200'"
-              @click="useCustom = !useCustom"
-            >
-              <span
-                class="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200"
-                :style="useCustom ? 'transform: translateX(20px)' : 'transform: translateX(0)'"
-              ></span>
-            </button>
-          </div>
+            <!-- Toggle Akses Khusus (hanya untuk target user) -->
+            <div class="flex items-center justify-between border-t border-slate-100 px-5 py-4" x-show="targetType === 'user'">
+              <span class="text-sm font-medium text-slate-700">Gunakan Akses Khusus untuk User Ini</span>
+              <button
+                type="button"
+                class="relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200"
+                :class="useCustom ? 'bg-primary-600' : 'bg-slate-200'"
+                @click="useCustom = !useCustom"
+              >
+                <span
+                  class="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200"
+                  :style="useCustom ? 'transform: translateX(20px)' : 'transform: translateX(0)'"
+                ></span>
+              </button>
+            </div>
 
-          <!-- Daftar toggle menu -->
-          <div class="app-card divide-y divide-slate-100 p-2" :class="togglesLocked && 'opacity-60'">
-            <template x-if="loading">
-              <div class="space-y-3 p-3">
-                <template x-for="i in 5" :key="i"><div class="skeleton-line"></div></template>
-              </div>
-            </template>
+            <!-- Daftar toggle menu -->
+            <div class="divide-y divide-slate-100 border-t border-slate-100" :class="togglesLocked && 'opacity-60'">
+              <template x-if="loading">
+                <div class="space-y-3 p-5">
+                  <template x-for="i in 5" :key="i"><div class="skeleton-line"></div></template>
+                </div>
+              </template>
 
-            <template x-for="key in menuKeys" :key="key">
-              <div x-show="!loading" class="flex items-center justify-between px-3 py-3">
-                <span class="text-sm text-slate-700" x-text="menuMeta[key].label"></span>
-                <button
-                  type="button"
-                  class="relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200"
-                  :class="menus[key] ? 'bg-primary-600' : 'bg-slate-200'"
-                  :disabled="togglesLocked"
-                  @click="toggleMenu(key)"
-                >
-                  <span
-                    class="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200"
-                    :style="menus[key] ? 'transform: translateX(20px)' : 'transform: translateX(0)'"
-                  ></span>
-                </button>
-              </div>
-            </template>
+              <template x-for="key in menuKeys" :key="key">
+                <div x-show="!loading" class="flex items-center justify-between px-5 py-3">
+                  <span class="text-sm text-slate-700" x-text="menuMeta[key].label"></span>
+                  <button
+                    type="button"
+                    class="relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200"
+                    :class="menus[key] ? 'bg-primary-600' : 'bg-slate-200'"
+                    :disabled="togglesLocked"
+                    @click="toggleMenu(key)"
+                  >
+                    <span
+                      class="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200"
+                      :style="menus[key] ? 'transform: translateX(20px)' : 'transform: translateX(0)'"
+                    ></span>
+                  </button>
+                </div>
+              </template>
+            </div>
 
-            <div x-show="!loading" class="p-3">
-              <button type="button" class="btn btn-primary w-full" :disabled="saving" @click="save()">
+            <div x-show="!loading" class="border-t border-slate-100 p-5">
+              <button type="button" class="btn btn-primary" :disabled="saving" @click="save()">
                 <span x-show="!saving">Simpan Akses Menu</span>
                 <span x-show="saving">Menyimpan...</span>
               </button>
