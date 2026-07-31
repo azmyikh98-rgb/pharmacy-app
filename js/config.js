@@ -49,7 +49,6 @@ const APP_CONFIG = Object.freeze({
     APOTEKER: "apoteker",
     KASIR: "kasir",
     GUDANG: "gudang",
-    OWNER: "owner",
   }),
 
   // Nama spreadsheet/modul backend (harus sama persis dengan yang dipakai di Apps Script Config.gs)
