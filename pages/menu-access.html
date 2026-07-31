@@ -95,7 +95,7 @@
             </template>
 
             <template x-for="key in menuKeys" :key="key">
-              <div class="flex items-center justify-between px-3 py-3">
+              <div x-show="!loading" class="flex items-center justify-between px-3 py-3">
                 <span class="text-sm text-slate-700" x-text="menuMeta[key].label"></span>
                 <button
                   type="button"
@@ -112,7 +112,7 @@
               </div>
             </template>
 
-            <div class="p-3">
+            <div x-show="!loading" class="p-3">
               <button type="button" class="btn btn-primary w-full" :disabled="saving" @click="save()">
                 <span x-show="!saving">Simpan Akses Menu</span>
                 <span x-show="saving">Menyimpan...</span>
