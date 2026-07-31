@@ -16,18 +16,23 @@
  *   purchase | sales | stock | report | setting
  *
  * target_type : "role" atau "user"
- * target_id   : nama role (kasir/apoteker/gudang/owner) ATAU id user
+ * target_id   : nama role (kasir/apoteker/gudang) ATAU id user
  * use_custom  : hanya relevan untuk baris "user" — TRUE/FALSE
  * kolom menu  : TRUE/FALSE (kosong dianggap TRUE / boleh akses)
  *
  * Granularitas menu sengaja setingkat menu utama di sidebar (bukan sampai
  * ke sub-halaman seperti Obat/Supplier terpisah) — cukup untuk kebutuhan
  * "role X tidak perlu lihat Laporan", tanpa kompleksitas berlebihan.
+ * Halaman Setting (termasuk User & Akses Menu) sengaja TIDAK masuk daftar
+ * menu yang bisa diatur di sini — akses ke Setting selalu FIXED khusus
+ * role "admin" (lihat Auth.requireAuth(['admin']) di setting.html,
+ * users.html, menu-access.html), tidak bisa diaktifkan/dinonaktifkan
+ * lewat pengaturan Akses Menu ini.
  * -----------------------------------------------------------------------
  */
 
-const MENU_KEYS_ = ["dashboard", "master_data", "purchase", "sales", "stock", "report", "setting"];
-const ROLES_FOR_ACCESS_ = ["apoteker", "kasir", "gudang", "owner"]; // admin selalu full access, tidak diatur di sini
+const MENU_KEYS_ = ["dashboard", "master_data", "purchase", "sales", "stock", "report"];
+const ROLES_FOR_ACCESS_ = ["apoteker", "kasir", "gudang"]; // admin selalu full access, tidak diatur di sini
 
 const MenuAccessModule = {
   /** Dropdown target: daftar role (selain admin) + daftar user (selain admin). */

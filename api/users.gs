@@ -10,7 +10,7 @@
  * -----------------------------------------------------------------------
  */
 
-const VALID_ROLES_ = ["admin", "apoteker", "kasir", "gudang", "owner"];
+const VALID_ROLES_ = ["admin", "apoteker", "kasir", "gudang"];
 
 const UserModule = {
   list(params) {

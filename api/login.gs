@@ -7,7 +7,7 @@
  * sheet/tab bernama "Data" dengan kolom minimal (header baris pertama):
  *   id | username | password_hash | name | role | status
  *
- * role  : salah satu dari admin | apoteker | kasir | gudang | owner
+ * role  : salah satu dari admin | apoteker | kasir | gudang
  * status: "active" atau "inactive" (user nonaktif tidak bisa login)
  *
  * Password TIDAK PERNAH disimpan dalam bentuk plain text — kolom
