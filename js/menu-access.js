@@ -46,7 +46,18 @@ function menuAccessPage() {
       } catch (err) {
         Toast.error("Gagal memuat daftar role/user");
       }
-      await this.loadAccess();
+
+      // Paksa <select> menyesuaikan ulang tampilan pilihannya sekarang setelah
+      // <option> dari roles/users benar-benar ada di DOM. Tanpa ini, browser
+      // bisa menampilkan opsi pertama yang tersedia (mis. "Apoteker") padahal
+      // data yang sebenarnya dimuat tetap sesuai selectedTarget awal ("kasir") —
+      // teks & toggle jadi benar, tapi tampilan dropdown-nya menyesatkan.
+      const current = this.selectedTarget;
+      this.selectedTarget = "";
+      this.$nextTick(async () => {
+        this.selectedTarget = current;
+        await this.loadAccess();
+      });
     },
 
     get selectedUser() {
