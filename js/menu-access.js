@@ -23,13 +23,21 @@ function menuAccessPage() {
     roles: [],
     users: [],
     selectedTarget: "role:kasir",
-    targetType: "role",
-    targetId: "kasir",
     useCustom: false,
     menus: {},
 
     loading: true,
     saving: false,
+
+    // targetType & targetId SENGAJA dihitung otomatis dari selectedTarget
+    // (bukan disimpan terpisah) — supaya tidak mungkin tidak sinkron dengan
+    // pilihan dropdown yang sedang ditampilkan.
+    get targetType() {
+      return this.selectedTarget.split(":")[0];
+    },
+    get targetId() {
+      return this.selectedTarget.split(":")[1];
+    },
 
     async init() {
       try {
@@ -52,9 +60,6 @@ function menuAccessPage() {
     },
 
     onTargetChange() {
-      const [type, id] = this.selectedTarget.split(":");
-      this.targetType = type;
-      this.targetId = id;
       this.loadAccess();
     },
 
