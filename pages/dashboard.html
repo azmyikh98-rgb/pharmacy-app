@@ -199,10 +199,10 @@
             <div class="app-card p-5">
               <h2 class="mb-3 text-sm font-semibold text-slate-700">Shortcut Menu</h2>
               <div class="grid grid-cols-2 gap-2">
-                <a href="#" class="btn btn-outline justify-center">+ Obat</a>
-                <a href="#" class="btn btn-outline justify-center">+ Pembelian</a>
-                <a href="#" class="btn btn-outline justify-center">Buka POS</a>
-                <a href="#" class="btn btn-outline justify-center">Laporan</a>
+                <a href="medicine.html" class="btn btn-outline justify-center">+ Obat</a>
+                <a href="purchase.html" class="btn btn-outline justify-center">+ Pembelian</a>
+                <a href="pos.html" class="btn btn-outline justify-center">Buka POS</a>
+                <a href="report.html" class="btn btn-outline justify-center">Laporan</a>
               </div>
             </div>
           </div>
@@ -211,6 +211,16 @@
       </main>
     </div>
   </div>
+
+  <!-- Floating Action Button: Buka POS Kasir -->
+  <a
+    href="pos.html"
+    class="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-white shadow-soft-lg transition-transform hover:scale-105 hover:bg-primary-700"
+    title="Buka POS Kasir"
+    aria-label="Buka POS Kasir"
+  >
+    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.723 2.436-7.234a1.125 1.125 0 0 0-1.1-1.362H5.25M7.5 14.25 5.106 5.272M6.75 14.25 4.106 5.272"/></svg>
+  </a>
 
   <div data-include="../components/toast.html"></div>
   <div data-include="../components/modal.html"></div>
