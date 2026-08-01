@@ -191,7 +191,11 @@ function listCustomersBrief_() {
   const { values, headers } = readSheet_("customer", "Data");
   const nameIdx = headers.indexOf("name");
   const pointIdx = headers.indexOf("member_point");
-  return values.slice(1).map((row) => ({ id: row[0], name: row[nameIdx], member_point: row[pointIdx] }));
+  const statusIdx = headers.indexOf("status");
+  return values
+    .slice(1)
+    .filter((row) => row[statusIdx] === "active")
+    .map((row) => ({ id: row[0], name: row[nameIdx], member_point: row[pointIdx] }));
 }
 
 function validateSalesPayload_(payload) {
