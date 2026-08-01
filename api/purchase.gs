@@ -226,6 +226,7 @@ function listActiveMedicines_() {
   const codeIdx = headers.indexOf("code");
   const barcodeIdx = headers.indexOf("barcode");
   const nameIdx = headers.indexOf("name");
+  const categoryIdx = headers.indexOf("category");
   const buyIdx = headers.indexOf("buy_price");
   const sellIdx = headers.indexOf("sell_price");
   const stockIdx = headers.indexOf("stock");
@@ -238,6 +239,7 @@ function listActiveMedicines_() {
       code: row[codeIdx],
       barcode: row[barcodeIdx],
       name: row[nameIdx],
+      category: row[categoryIdx],
       buy_price: row[buyIdx],
       sell_price: row[sellIdx],
       stock: row[stockIdx],
