@@ -13,7 +13,10 @@ function posPage() {
     medicines: [],
     customers: [],
     search: "",
+    selectedCategory: "Semua",
     cart: [],
+    cartExpanded: false,
+    favorites: [],
 
     customerId: "",
     customerName: "Umum",
@@ -49,15 +52,40 @@ function posPage() {
       }
     },
 
+    /** Daftar kategori unik dari obat aktif — dipakai untuk pill filter ("Semua" + tiap kategori). */
+    get categories() {
+      const unique = [...new Set(this.medicines.map((m) => m.category).filter(Boolean))];
+      return ["Semua", ...unique];
+    },
+
     get filteredMedicines() {
       const q = this.search.toLowerCase().trim();
-      if (!q) return this.medicines;
-      return this.medicines.filter(
-        (m) =>
+      return this.medicines.filter((m) => {
+        const matchesCategory = this.selectedCategory === "Semua" || m.category === this.selectedCategory;
+        const matchesSearch =
+          !q ||
           (m.name || "").toLowerCase().includes(q) ||
           (m.code || "").toLowerCase().includes(q) ||
-          (m.barcode || "").toLowerCase().includes(q)
-      );
+          (m.barcode || "").toLowerCase().includes(q);
+        return matchesCategory && matchesSearch;
+      });
+    },
+
+    /** Favorit produk bersifat LOKAL di browser (belum disimpan ke server) — murni penanda visual cepat. */
+    toggleFavorite(id) {
+      if (this.favorites.includes(id)) {
+        this.favorites = this.favorites.filter((f) => f !== id);
+      } else {
+        this.favorites.push(id);
+      }
+    },
+
+    isFavorite(id) {
+      return this.favorites.includes(id);
+    },
+
+    get totalQty() {
+      return this.cart.reduce((sum, item) => sum + Number(item.qty || 0), 0);
     },
 
     /** Ditangkap saat scanner barcode "mengetik" kode lalu mengirim Enter. */
