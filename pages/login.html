@@ -32,15 +32,15 @@
 
   <div class="flex min-h-screen items-center justify-center p-6">
     <div x-data="loginForm()" class="w-full max-w-sm">
-      <div class="mb-6 text-center">
-        <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-lg font-semibold text-white">
-          RX
-        </div>
-        <h1 class="text-lg font-semibold text-slate-900" x-text="appName"></h1>
-        <p class="text-sm text-slate-500">Masuk untuk melanjutkan</p>
-      </div>
-
       <form @submit.prevent="submit()" class="app-card space-y-4 p-6">
+        <div class="mb-2 text-center">
+          <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-lg font-semibold text-white">
+            RX
+          </div>
+          <h1 class="text-lg font-semibold text-slate-900" x-text="appName"></h1>
+          <p class="text-sm text-slate-500">Masuk untuk melanjutkan</p>
+        </div>
+
         <div
           x-show="errorMessage"
           x-transition
