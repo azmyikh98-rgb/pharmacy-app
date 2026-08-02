@@ -71,17 +71,17 @@
           </div>
 
           <!-- Ringkasan keranjang (klik untuk buka modal) -->
-          <button type="button" class="app-card flex w-full items-center justify-between gap-3 p-4" @click="cartExpanded = true">
-            <div class="flex items-center gap-3">
-              <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-50 text-primary-600">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.723 2.436-7.234a1.125 1.125 0 0 0-1.1-1.362H5.25M7.5 14.25 5.106 5.272M6.75 14.25 4.106 5.272"/></svg>
+          <button type="button" class="app-card flex w-full items-center justify-between gap-2 p-3" @click="cartExpanded = true">
+            <div class="flex min-w-0 items-center gap-2">
+              <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-600">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.723 2.436-7.234a1.125 1.125 0 0 0-1.1-1.362H5.25M7.5 14.25 5.106 5.272M6.75 14.25 4.106 5.272"/></svg>
               </div>
-              <span class="text-sm font-semibold text-slate-800">Pelanggan <span x-text="customerName"></span></span>
-              <span class="badge badge-neutral" x-text="totalQty + ' item'"></span>
+              <span class="truncate text-sm font-semibold text-slate-800">Pelanggan <span x-text="customerName"></span></span>
+              <span class="badge badge-neutral shrink-0 whitespace-nowrap" x-text="totalQty + ' item'"></span>
             </div>
-            <div class="flex items-center gap-3">
-              <span class="text-base font-semibold text-slate-900" x-text="formatRupiah(total)"></span>
-              <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"/></svg>
+            <div class="flex shrink-0 items-center gap-2">
+              <span class="whitespace-nowrap text-sm font-semibold text-slate-900 sm:text-base" x-text="formatRupiah(total)"></span>
+              <svg class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"/></svg>
             </div>
           </button>
 
