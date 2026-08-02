@@ -89,7 +89,7 @@
                 <template x-for="held in heldCarts" :key="held.id">
                   <div class="flex items-center justify-between rounded-lg border border-slate-100 p-3">
                     <div>
-                      <p class="text-sm font-medium text-slate-800">Pelanggan <span x-text="held.customerName"></span></p>
+                      <p class="text-sm font-medium text-slate-800">Pelanggan <span x-text="held.customerName || 'Umum'"></span></p>
                       <p class="text-xs text-slate-400" x-text="held.cart.length + ' jenis produk'"></p>
                     </div>
                     <div class="flex gap-2">
@@ -114,7 +114,7 @@
               <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-600">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.723 2.436-7.234a1.125 1.125 0 0 0-1.1-1.362H5.25M7.5 14.25 5.106 5.272M6.75 14.25 4.106 5.272"/></svg>
               </div>
-              <span class="truncate text-sm font-semibold text-slate-800">Pelanggan <span x-text="customerName"></span></span>
+              <span class="truncate text-sm font-semibold text-slate-800">Pelanggan <span x-text="customerName || 'Umum'"></span></span>
               <span class="badge badge-neutral shrink-0 whitespace-nowrap" x-text="totalQty + ' item'"></span>
             </div>
             <div class="flex shrink-0 items-center gap-2">
@@ -171,6 +171,12 @@
                       <option value="">Umum (tanpa member)</option>
                       <template x-for="c in customers" :key="c.id"><option :value="c.id" x-text="c.name + ' (poin: ' + (c.member_point || 0) + ')'"></option></template>
                     </select>
+                  </div>
+
+                  <!-- Nama Pelanggan (wajib diisi untuk transaksi Umum, tanpa member) -->
+                  <div class="mt-3" x-show="!customerId">
+                    <label class="input-label">Nama Pelanggan <span class="text-danger-600">*</span></label>
+                    <input type="text" class="input-field" x-model="customerName" placeholder="Contoh: Budi Santoso" />
                   </div>
 
                   <!-- Diskon / Voucher / Pajak -->
