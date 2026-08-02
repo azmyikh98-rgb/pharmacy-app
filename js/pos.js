@@ -21,7 +21,7 @@ function posPage() {
     showHeldList: false,
 
     customerId: "",
-    customerName: "Umum",
+    customerName: "",
     discount: 0,
     voucher: 0,
     taxPercent: 0,
@@ -165,7 +165,7 @@ function posPage() {
 
     onCustomerChange() {
       const customer = this.customers.find((c) => String(c.id) === String(this.customerId));
-      this.customerName = customer ? customer.name : "Umum";
+      this.customerName = customer ? customer.name : "";
     },
 
     formatRupiah(v) {
@@ -176,6 +176,10 @@ function posPage() {
       this.checkoutError = "";
       if (this.cart.length === 0) {
         this.checkoutError = "Keranjang belanja masih kosong";
+        return;
+      }
+      if (!this.customerId && !this.customerName.trim()) {
+        this.checkoutError = "Nama pelanggan wajib diisi untuk transaksi Umum (tanpa member)";
         return;
       }
       if (Number(this.paidAmount) < this.total) {
@@ -231,7 +235,7 @@ function posPage() {
     resetCart() {
       this.cart = [];
       this.customerId = "";
-      this.customerName = "Umum";
+      this.customerName = "";
       this.discount = 0;
       this.voucher = 0;
       this.taxPercent = 0;
