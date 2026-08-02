@@ -176,35 +176,23 @@
             </div>
           </div>
 
-          <!-- Recent Activity & Shortcut -->
-          <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <div class="app-card p-5 lg:col-span-2">
-              <h2 class="mb-3 text-sm font-semibold text-slate-700">Aktivitas Terbaru</h2>
-              <template x-if="!loading && recentActivity.length === 0">
-                <p class="text-sm text-slate-400">Belum ada aktivitas transaksi.</p>
-              </template>
-              <template x-for="activity in recentActivity" :key="activity.summary + activity.date">
-                <div class="activity-item">
-                  <span
-                    class="badge"
-                    :class="activity.type === 'sales' ? 'badge-success' : 'badge-neutral'"
-                    x-text="activity.type === 'sales' ? 'Penjualan' : 'Pembelian'"
-                  ></span>
-                  <span class="flex-1 text-sm text-slate-700" x-text="activity.summary"></span>
-                  <span class="text-xs text-slate-400" x-text="formatDate(activity.date)"></span>
-                </div>
-              </template>
-            </div>
-
-            <div class="app-card p-5">
-              <h2 class="mb-3 text-sm font-semibold text-slate-700">Shortcut Menu</h2>
-              <div class="grid grid-cols-2 gap-2">
-                <a href="medicine.html" class="btn btn-outline justify-center">+ Obat</a>
-                <a href="purchase.html" class="btn btn-outline justify-center">+ Pembelian</a>
-                <a href="pos.html" class="btn btn-outline justify-center">Buka POS</a>
-                <a href="report.html" class="btn btn-outline justify-center">Laporan</a>
+          <!-- Recent Activity -->
+          <div class="app-card p-5">
+            <h2 class="mb-3 text-sm font-semibold text-slate-700">Aktivitas Terbaru</h2>
+            <template x-if="!loading && recentActivity.length === 0">
+              <p class="text-sm text-slate-400">Belum ada aktivitas transaksi.</p>
+            </template>
+            <template x-for="activity in recentActivity" :key="activity.summary + activity.date">
+              <div class="activity-item">
+                <span
+                  class="badge"
+                  :class="activity.type === 'sales' ? 'badge-success' : 'badge-neutral'"
+                  x-text="activity.type === 'sales' ? 'Penjualan' : 'Pembelian'"
+                ></span>
+                <span class="flex-1 text-sm text-slate-700" x-text="activity.summary"></span>
+                <span class="text-xs text-slate-400" x-text="formatDate(activity.date)"></span>
               </div>
-            </div>
+            </template>
           </div>
 
         </div>
