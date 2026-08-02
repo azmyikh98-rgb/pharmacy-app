@@ -17,6 +17,8 @@ function posPage() {
     cart: [],
     cartExpanded: false,
     favorites: [],
+    heldCarts: [],
+    showHeldList: false,
 
     customerId: "",
     customerName: "Umum",
@@ -235,6 +237,70 @@ function posPage() {
       this.taxPercent = 0;
       this.paymentMethod = "cash";
       this.paidAmount = 0;
+    },
+
+    /** Batalkan transaksi yang sedang disusun — keranjang dikosongkan setelah dikonfirmasi. */
+    cancelTransaction() {
+      if (this.cart.length === 0) {
+        this.cartExpanded = false;
+        return;
+      }
+      Confirm.ask({
+        title: "Batalkan Transaksi?",
+        message: "Keranjang belanja saat ini akan dikosongkan dan tidak bisa dikembalikan.",
+        variant: "danger",
+        onConfirm: () => {
+          this.resetCart();
+          this.cartExpanded = false;
+          Toast.info("Transaksi dibatalkan");
+        },
+      });
+    },
+
+    /**
+     * Tunda transaksi — keranjang saat ini "diparkir" ke daftar heldCarts
+     * (disimpan sementara di browser, BUKAN ke server) supaya kasir bisa
+     * melayani pelanggan lain dulu, lalu melanjutkan transaksi ini lagi
+     * lewat tombol "Tertunda" di sebelah kolom pencarian.
+     */
+    holdTransaction() {
+      if (this.cart.length === 0) {
+        Toast.error("Keranjang masih kosong, tidak ada yang bisa ditunda");
+        return;
+      }
+      this.heldCarts.push({
+        id: Utils.generateTempId("held"),
+        customerId: this.customerId,
+        customerName: this.customerName,
+        cart: this.cart,
+        discount: this.discount,
+        voucher: this.voucher,
+        taxPercent: this.taxPercent,
+        paymentMethod: this.paymentMethod,
+        createdAt: new Date(),
+      });
+      this.resetCart();
+      this.cartExpanded = false;
+      Toast.success("Transaksi ditunda, bisa dilanjutkan lagi lewat tombol Tertunda");
+    },
+
+    resumeHeldTransaction(heldId) {
+      const held = this.heldCarts.find((h) => h.id === heldId);
+      if (!held) return;
+      this.cart = held.cart;
+      this.customerId = held.customerId;
+      this.customerName = held.customerName;
+      this.discount = held.discount;
+      this.voucher = held.voucher;
+      this.taxPercent = held.taxPercent;
+      this.paymentMethod = held.paymentMethod;
+      this.heldCarts = this.heldCarts.filter((h) => h.id !== heldId);
+      this.showHeldList = false;
+      this.cartExpanded = true;
+    },
+
+    removeHeldTransaction(heldId) {
+      this.heldCarts = this.heldCarts.filter((h) => h.id !== heldId);
     },
 
     closeReceipt() {
