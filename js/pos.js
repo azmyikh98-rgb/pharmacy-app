@@ -126,16 +126,26 @@ function posPage() {
             this.cameraList = [];
           }
 
-          // Minta kamera BELAKANG langsung lewat constraint facingMode — ini lebih
-          // andal daripada menebak dari label kamera (banyak browser/HP tidak
-          // menampilkan label kamera yang jelas sebelum izin diberikan).
-          await this.startCamera({ facingMode: { exact: "environment" } });
+          // facingMode + resolusi lebih tinggi + focusMode continuous (best-effort —
+          // tidak semua browser/HP mendukung kontrol fokus lewat web, tapi resolusi
+          // lebih tinggi membantu decoder membaca barcode meski fokus belum sempurna).
+          await this.startCamera({
+            facingMode: { exact: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            advanced: [{ focusMode: "continuous" }],
+          });
         } catch (err) {
           // Sebagian perangkat (laptop/PC tanpa kamera belakang) menolak
           // constraint "exact" — coba lagi tanpa "exact", lalu fallback ke
           // kamera pertama yang tersedia kalau masih gagal juga.
           try {
-            await this.startCamera({ facingMode: "environment" });
+            await this.startCamera({
+              facingMode: "environment",
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+              advanced: [{ focusMode: "continuous" }],
+            });
           } catch (err2) {
             if (this.cameraList && this.cameraList.length > 0) {
               this.currentCameraIndex = 0;
