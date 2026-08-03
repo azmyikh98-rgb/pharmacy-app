@@ -21,6 +21,8 @@ function posPage() {
     showHeldList: false,
     showScanner: false,
     scannerInstance: null,
+    cameraList: [],
+    currentCameraIndex: 0,
 
     customerId: "",
     customerName: "",
@@ -116,27 +118,67 @@ function posPage() {
       this.$nextTick(async () => {
         try {
           this.scannerInstance = new Html5Qrcode("barcode-reader");
-          const cameras = await Html5Qrcode.getCameras();
-          if (!cameras || cameras.length === 0) {
-            Toast.error("Tidak ada kamera yang terdeteksi di perangkat ini");
-            this.showScanner = false;
-            return;
-          }
-          // Utamakan kamera belakang (lebih cocok untuk scan barcode fisik) kalau tersedia.
-          const backCamera = cameras.find((c) => /back|rear|environment/i.test(c.label));
-          const cameraId = backCamera ? backCamera.id : cameras[0].id;
 
-          await this.scannerInstance.start(
-            cameraId,
-            { fps: 10, qrbox: { width: 250, height: 150 } },
-            (decodedText) => this.onBarcodeScanned(decodedText),
-            () => {} // callback "tidak ditemukan" per frame — sengaja diabaikan, bukan error
-          );
+          // Ambil daftar kamera dulu untuk keperluan tombol "Ganti Kamera" manual.
+          try {
+            this.cameraList = await Html5Qrcode.getCameras();
+          } catch (err) {
+            this.cameraList = [];
+          }
+
+          // Minta kamera BELAKANG langsung lewat constraint facingMode — ini lebih
+          // andal daripada menebak dari label kamera (banyak browser/HP tidak
+          // menampilkan label kamera yang jelas sebelum izin diberikan).
+          await this.startCamera({ facingMode: { exact: "environment" } });
         } catch (err) {
-          Toast.error("Gagal mengakses kamera: " + (err.message || err));
-          this.showScanner = false;
+          // Sebagian perangkat (laptop/PC tanpa kamera belakang) menolak
+          // constraint "exact" — coba lagi tanpa "exact", lalu fallback ke
+          // kamera pertama yang tersedia kalau masih gagal juga.
+          try {
+            await this.startCamera({ facingMode: "environment" });
+          } catch (err2) {
+            if (this.cameraList && this.cameraList.length > 0) {
+              this.currentCameraIndex = 0;
+              await this.startCamera(this.cameraList[0].id).catch((err3) => {
+                Toast.error("Gagal mengakses kamera: " + (err3.message || err3));
+                this.showScanner = false;
+              });
+            } else {
+              Toast.error("Tidak ada kamera yang terdeteksi di perangkat ini");
+              this.showScanner = false;
+            }
+          }
         }
       });
+    },
+
+    /** Menjalankan kamera dengan constraint/ID tertentu — dipakai openScanner() & switchCamera(). */
+    async startCamera(cameraIdOrConstraint) {
+      await this.scannerInstance.start(
+        cameraIdOrConstraint,
+        { fps: 10, qrbox: { width: 250, height: 150 } },
+        (decodedText) => this.onBarcodeScanned(decodedText),
+        () => {} // callback "tidak ditemukan" per frame — sengaja diabaikan, bukan error
+      );
+    },
+
+    /** Tombol manual untuk pindah ke kamera lain kalau auto-deteksi salah pilih. */
+    async switchCamera() {
+      if (!this.cameraList || this.cameraList.length < 2) {
+        Toast.error("Hanya ada 1 kamera yang terdeteksi di perangkat ini");
+        return;
+      }
+      try {
+        await this.scannerInstance.stop();
+      } catch (err) {
+        // abaikan jika kamera sudah berhenti
+      }
+      this.currentCameraIndex = (this.currentCameraIndex + 1) % this.cameraList.length;
+      try {
+        await this.startCamera(this.cameraList[this.currentCameraIndex].id);
+      } catch (err) {
+        Toast.error("Gagal beralih kamera: " + (err.message || err));
+      }
     },
 
     async closeScanner() {
@@ -149,6 +191,7 @@ function posPage() {
         }
         this.scannerInstance = null;
       }
+      this.currentCameraIndex = 0;
       this.showScanner = false;
     },
 
