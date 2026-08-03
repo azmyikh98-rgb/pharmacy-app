@@ -116,47 +116,41 @@ function posPage() {
       }
       this.showScanner = true;
       this.$nextTick(async () => {
+        // Ambil daftar kamera dulu untuk keperluan tombol "Ganti Kamera" manual.
         try {
-          this.scannerInstance = new Html5Qrcode("barcode-reader");
+          this.cameraList = await Html5Qrcode.getCameras();
+        } catch (err) {
+          this.cameraList = [];
+        }
 
-          // Ambil daftar kamera dulu untuk keperluan tombol "Ganti Kamera" manual.
-          try {
-            this.cameraList = await Html5Qrcode.getCameras();
-          } catch (err) {
-            this.cameraList = [];
-          }
-
-          // facingMode + resolusi lebih tinggi + focusMode continuous (best-effort —
-          // tidak semua browser/HP mendukung kontrol fokus lewat web, tapi resolusi
-          // lebih tinggi membantu decoder membaca barcode meski fokus belum sempurna).
+        this.scannerInstance = new Html5Qrcode("barcode-reader");
+        try {
+          // facingMode NON-exact: browser otomatis pilih kamera belakang kalau ada,
+          // tanpa melempar error kalau tidak ada (beda dari "exact" yang bisa gagal
+          // total di sebagian perangkat). + resolusi lebih tinggi & focusMode
+          // continuous (best-effort) supaya barcode lebih mudah terbaca.
           await this.startCamera({
-            facingMode: { exact: "environment" },
+            facingMode: "environment",
             width: { ideal: 1280 },
             height: { ideal: 720 },
             advanced: [{ focusMode: "continuous" }],
           });
         } catch (err) {
-          // Sebagian perangkat (laptop/PC tanpa kamera belakang) menolak
-          // constraint "exact" — coba lagi tanpa "exact", lalu fallback ke
-          // kamera pertama yang tersedia kalau masih gagal juga.
-          try {
-            await this.startCamera({
-              facingMode: "environment",
-              width: { ideal: 1280 },
-              height: { ideal: 720 },
-              advanced: [{ focusMode: "continuous" }],
-            });
-          } catch (err2) {
-            if (this.cameraList && this.cameraList.length > 0) {
+          // Kalau tetap gagal, JANGAN coba lagi di instance yang sama (instance lama
+          // bisa nyangkut di status "transitioning" dan bikin error baru) — buat
+          // instance baru, lalu coba pakai ID kamera pertama yang terdeteksi.
+          if (this.cameraList && this.cameraList.length > 0) {
+            try {
+              this.scannerInstance = new Html5Qrcode("barcode-reader");
               this.currentCameraIndex = 0;
-              await this.startCamera(this.cameraList[0].id).catch((err3) => {
-                Toast.error("Gagal mengakses kamera: " + (err3.message || err3));
-                this.showScanner = false;
-              });
-            } else {
-              Toast.error("Tidak ada kamera yang terdeteksi di perangkat ini");
+              await this.startCamera(this.cameraList[0].id);
+            } catch (err2) {
+              Toast.error("Gagal mengakses kamera: " + (err2.message || err2));
               this.showScanner = false;
             }
+          } else {
+            Toast.error("Gagal mengakses kamera: " + (err.message || err));
+            this.showScanner = false;
           }
         }
       });
