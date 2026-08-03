@@ -19,6 +19,8 @@ function posPage() {
     favorites: [],
     heldCarts: [],
     showHeldList: false,
+    showScanner: false,
+    scannerInstance: null,
 
     customerId: "",
     customerName: "",
@@ -90,12 +92,75 @@ function posPage() {
       return this.cart.reduce((sum, item) => sum + Number(item.qty || 0), 0);
     },
 
-    /** Ditangkap saat scanner barcode "mengetik" kode lalu mengirim Enter. */
+    /** Ditangkap saat scanner barcode USB "mengetik" kode lalu mengirim Enter. */
     onSearchEnter() {
       const exact = this.medicines.find((m) => m.barcode && String(m.barcode) === this.search.trim());
       if (exact) {
         this.addToCart(exact);
         this.search = "";
+      }
+    },
+
+    /**
+     * Scan Barcode via KAMERA — cara kedua selain scanner USB (onSearchEnter
+     * di atas). Memakai library html5-qrcode (CDN) yang membaca feed kamera
+     * langsung di browser, tanpa perlu hardware scanner fisik. Cocok dipakai
+     * dari HP/tablet kasir yang tidak punya scanner USB.
+     */
+    async openScanner() {
+      if (typeof Html5Qrcode === "undefined") {
+        Toast.error("Modul pemindai barcode gagal dimuat, cek koneksi internet");
+        return;
+      }
+      this.showScanner = true;
+      this.$nextTick(async () => {
+        try {
+          this.scannerInstance = new Html5Qrcode("barcode-reader");
+          const cameras = await Html5Qrcode.getCameras();
+          if (!cameras || cameras.length === 0) {
+            Toast.error("Tidak ada kamera yang terdeteksi di perangkat ini");
+            this.showScanner = false;
+            return;
+          }
+          // Utamakan kamera belakang (lebih cocok untuk scan barcode fisik) kalau tersedia.
+          const backCamera = cameras.find((c) => /back|rear|environment/i.test(c.label));
+          const cameraId = backCamera ? backCamera.id : cameras[0].id;
+
+          await this.scannerInstance.start(
+            cameraId,
+            { fps: 10, qrbox: { width: 250, height: 150 } },
+            (decodedText) => this.onBarcodeScanned(decodedText),
+            () => {} // callback "tidak ditemukan" per frame — sengaja diabaikan, bukan error
+          );
+        } catch (err) {
+          Toast.error("Gagal mengakses kamera: " + (err.message || err));
+          this.showScanner = false;
+        }
+      });
+    },
+
+    async closeScanner() {
+      if (this.scannerInstance) {
+        try {
+          await this.scannerInstance.stop();
+          this.scannerInstance.clear();
+        } catch (err) {
+          // Kamera mungkin sudah berhenti sendiri — aman diabaikan.
+        }
+        this.scannerInstance = null;
+      }
+      this.showScanner = false;
+    },
+
+    async onBarcodeScanned(code) {
+      const match = this.medicines.find((m) => m.barcode && String(m.barcode) === String(code).trim());
+      if (match) {
+        this.addToCart(match);
+        Toast.success(`${match.name} ditambahkan ke keranjang`);
+        await this.closeScanner();
+      } else {
+        Toast.error(`Barcode "${code}" tidak ditemukan di data Obat`);
+        // Modal tetap terbuka & kamera tetap jalan supaya kasir bisa langsung coba scan lagi.
       }
     },
 
