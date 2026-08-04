@@ -23,6 +23,11 @@ function posPage() {
     scannerInstance: null,
     cameraList: [],
     currentCameraIndex: 0,
+    zoomSupported: false,
+    zoomMin: 1,
+    zoomMax: 1,
+    zoomStep: 1,
+    zoomValue: 1,
 
     customerId: "",
     customerName: "",
@@ -164,6 +169,39 @@ function posPage() {
         (decodedText) => this.onBarcodeScanned(decodedText),
         () => {} // callback "tidak ditemukan" per frame — sengaja diabaikan, bukan error
       );
+      this.detectZoomCapability();
+    },
+
+    /**
+     * Cek apakah kamera yang sedang jalan mendukung zoom (kebanyakan Android
+     * Chrome mendukung, iOS Safari umumnya TIDAK — keterbatasan browser, bukan
+     * kode kita). Kalau didukung, slider zoom ditampilkan di modal scanner.
+     */
+    detectZoomCapability() {
+      try {
+        const capabilities = this.scannerInstance.getRunningTrackCameraCapabilities();
+        const zoomFeature = capabilities.zoomFeature();
+        if (zoomFeature && zoomFeature.isSupported()) {
+          this.zoomSupported = true;
+          this.zoomMin = zoomFeature.min();
+          this.zoomMax = zoomFeature.max();
+          this.zoomStep = zoomFeature.step() || 0.1;
+          this.zoomValue = zoomFeature.value() || this.zoomMin;
+        } else {
+          this.zoomSupported = false;
+        }
+      } catch (err) {
+        this.zoomSupported = false;
+      }
+    },
+
+    applyZoom() {
+      try {
+        const capabilities = this.scannerInstance.getRunningTrackCameraCapabilities();
+        capabilities.zoomFeature().apply(Number(this.zoomValue));
+      } catch (err) {
+        // Perangkat tidak benar-benar mendukung zoom walau sempat terdeteksi — abaikan.
+      }
     },
 
     /** Tombol manual untuk pindah ke kamera lain kalau auto-deteksi salah pilih. */
@@ -196,6 +234,7 @@ function posPage() {
         this.scannerInstance = null;
       }
       this.currentCameraIndex = 0;
+      this.zoomSupported = false;
       this.showScanner = false;
     },
 
